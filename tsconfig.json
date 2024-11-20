@@ -1,6 +1,27 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "expo/tsconfig.base.json",
   "compilerOptions": {
-    "strict": true
-  }
+      "strict": true,
+      "lib": ["DOM", "ESNext"],
+      "types": ["node"],
+      "useDefineForClassFields": true,
+      "module": "ESNext",
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "allowImportingTsExtensions": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "jsx": "react-jsx",
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noFallthroughCasesInSwitch": true,
+      "allowJs": true,
+  },
+  "include": [
+      "src",
+      "src/**/*.ts",
+  ],
+  "exclude": ["node_modules", "build", "expo"],
 }
