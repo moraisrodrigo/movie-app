@@ -1,5 +1,6 @@
 enum SlicerName {
-    Movie = 'movie'
+    Movie = 'movie',
+    Authentication = 'auth',
 }
 
 export { SlicerName };

@@ -1,10 +1,10 @@
 import { FunctionComponent } from "react";
 import { Button, Text, View } from "react-native";
-import { AppRoute, HomeRouteParams } from "../../constants/routes";
+import { AppRoute, ProfileRouteParams } from "../../constants/routes";
 
-type Props = HomeRouteParams;
+type Props = ProfileRouteParams;
 
-const HomeScreen: FunctionComponent<Props> = (props: Props) => {
+const ProfileScreen: FunctionComponent<Props> = (props: Props) => {
     const { navigation: { navigate } } = props;
 
     return (
@@ -13,9 +13,9 @@ const HomeScreen: FunctionComponent<Props> = (props: Props) => {
                 title="nova pagina"
                 onPress={() => navigate(AppRoute.MovieWrapper, { screen: AppRoute.MoviesList })}
             />
-            <Text>Home Screen</Text>
+            <Text>Profile Screen</Text>
         </View>
     );
 }
 
-export { HomeScreen };
+export { ProfileScreen };

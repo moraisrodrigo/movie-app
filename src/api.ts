@@ -12,7 +12,6 @@ const setupInterceptor = () => {
             newConfig.headers.Authorization = `Bearer ${API_KEY}`;
 
             console.log('API_KEY = ', API_KEY);
-            
 
             return newConfig;
         },

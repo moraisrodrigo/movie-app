@@ -3,6 +3,7 @@ import { DefaultTheme, NavigationContainer, Theme, useNavigation } from '@react-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppRoute, RootStackParamList } from './src/constants/routes';
 import { HomeScreen } from './src/components/screens/HomeScreen';
+import { ProfileScreen } from './src/components/screens/ProfileScreen';
 import { store, persistor } from './src/store';
 import { MoviesScreen } from './src/components/screens/MoviesScreen';
 import { MovieScreen } from './src/components/screens/MovieScreen';
@@ -28,9 +29,13 @@ const getTitle = (route: string): ReactNode => {
         case AppRoute.Home:
             title = 'Home'
         break;
+        case AppRoute.Profile:
+            title = 'Profile'
+        break;
         case AppRoute.Movie:
             title = 'Details'
         break;
+        case AppRoute.MovieWrapper:
         case AppRoute.MoviesList:
             title = 'Movies'
         break;
@@ -46,7 +51,7 @@ const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavi
 
 const App: React.FC = () => {
 
-    const MoviesNav = (): ReactNode => {
+    const MoviesWrapper = (): ReactNode => {
         return (
            <StackNavigator initialRouteName={AppRoute.MoviesList}>
               <StackScreen name={AppRoute.MoviesList} component={MoviesScreen} />
@@ -59,9 +64,16 @@ const App: React.FC = () => {
         <PersistGate persistor={persistor}>
             <Provider store={store}>
                 <NavigationContainer theme={MyTheme}>
-                    <Navigator initialRouteName={AppRoute.MovieWrapper} screenOptions={{ headerTitle: ({ children }) => getTitle(children)}}>
+                    <Navigator
+                        initialRouteName={AppRoute.MovieWrapper}
+                        screenOptions={{ 
+                            tabBarLabel: ({ children }) => getTitle(children),
+                            headerTitle: ({ children }) => getTitle(children),
+                        }}
+                    >
                         <Screen name={AppRoute.Home} component={HomeScreen} />
-                        <Screen name={AppRoute.MovieWrapper} component={MoviesNav} />
+                        <Screen name={AppRoute.MovieWrapper} component={MoviesWrapper} />
+                        <Screen name={AppRoute.Profile} component={ProfileScreen} />
                     </Navigator>
                 </NavigationContainer>
             </Provider>

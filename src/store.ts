@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { movieReducer } from "./slicers/movieSlice";
+import { authenticationReducer } from "./slicers/authenticationSlice";
 
 const persistConfig = {
     key: 'root',
@@ -9,7 +10,8 @@ const persistConfig = {
 }
 
 const rootReducer = combineReducers({
-    movie: movieReducer
+    movie: movieReducer,
+    authentication: authenticationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
