@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image, Text, View } from 'react-native';
+import { AntDesign  } from '@expo/vector-icons';
 import { TMDB_IMG_URL } from '../../settings';
 import { Movie } from '../../types/movie';
 
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const MovieCover: FunctionComponent<Props> = (props: Props) => {
-	const { movie: { backdrop_path, poster_path, original_title }, onClick } = props;
+	const { movie: { backdrop_path, poster_path, original_title, vote_average }, onClick } = props;	
 
 	const Component = onClick ? TouchableOpacity : ScrollView
 
@@ -28,7 +29,8 @@ const MovieCover: FunctionComponent<Props> = (props: Props) => {
 					</View>
 					<View style={styles.cardNumbers}>
 						<View style={styles.cardStar}>
-							<Text style={styles.cardStarRatings}>* 8.9</Text>
+							<AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
+							<Text style={styles.cardStarRatings}>{vote_average}</Text>
 						</View>
 						<Text style={styles.cardRunningHours} />
 					</View>
@@ -64,13 +66,14 @@ const styles = StyleSheet.create({
 	cardTitle: {
 		color: 'white',
 		fontSize: 19,
-		fontWeight: '500',
+		fontWeight: '800',
 		paddingTop: 10
 	},
 	cardGenre: {
 		flexDirection: 'row'
 	},
 	cardGenreItem: {
+		fontWeight: '800',
 		fontSize: 11,
 		marginRight: 5,
 		color: 'white'
@@ -89,8 +92,12 @@ const styles = StyleSheet.create({
 	},
 	cardStarRatings: {
 		marginLeft: 5,
+		fontWeight: '800',
 		fontSize: 12,
 		color: 'white'
+	},
+	star: {
+		fontSize: 12,
 	},
 	cardRunningHours: {
 		marginLeft: 5,

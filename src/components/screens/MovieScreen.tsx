@@ -8,6 +8,7 @@ import { CastComponent } from '../elements/Cast';
 import { TMDB_IMG_URL } from '../../settings';
 import { MoviesList } from '../elements/MoviesList';
 import { Movie } from '../../types/movie';
+import { MovieCover } from '../elements/MovieCover';
 
 interface Props extends MovieRouteParams, MovieContext { }
 
@@ -53,22 +54,7 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
     return (
 		<SafeAreaView>
 			<ScrollView style={styles.screen}>
-				<Image source={{ uri: `${TMDB_IMG_URL}/w780/${(movie.backdrop_path || movie.poster_path)}` }} style={styles.imageBackdrop} />
-				<View style={styles.cardContainer}>
-					<Image source={{ uri: `${TMDB_IMG_URL}/w185/${movie.poster_path}` }} style={styles.cardImage} />
-					<View style={styles.cardDetails}>
-						<Text style={styles.cardTitle} numberOfLines={2}>{movie.original_title}</Text>
-						<View style={styles.cardGenre}>
-							<Text style={styles.cardGenreItem}>Action</Text>
-						</View>
-						<View style={styles.cardNumbers}>
-							<View style={styles.cardStar}>
-								<Text style={styles.cardStarRatings}>* 8.9</Text>
-							</View>
-							<Text style={styles.cardRunningHours} />
-						</View>
-					</View>
-				</View>
+				<MovieCover movie={movie} />
 				<Text style={styles.cardDescription} numberOfLines={3}>{movie.overview}</Text>
 				<CastComponent cast={cast} navigation={navigation} />
 				<Text style={styles.bolText}>Similar Movies</Text>

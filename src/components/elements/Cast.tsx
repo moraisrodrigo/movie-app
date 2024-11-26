@@ -22,12 +22,10 @@ const CastComponent: FunctionComponent<Props> = (props: Props) => {
             key={index}
             style={styles.person}
         >
-            <View>
-                <Image
-                    style={styles.avatar}
-                    source={{ uri: image185(profile_path) || fallbackPersonImage }}
-                />
-            </View>
+            <Image
+                style={styles.avatar}
+                source={{ uri: image185(profile_path) || fallbackPersonImage }}
+            />
             <Text style={styles.name} >
                 {renderName(character)}
             </Text>
@@ -55,9 +53,9 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
 	avatar: {
-        borderRadius: 800,
-        height: 30,
-        width: 30,
+        borderRadius: '50%',
+        height: 60,
+        width: 60,
     },
     person: {
         alignItems: 'center',
