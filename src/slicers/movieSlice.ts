@@ -4,10 +4,12 @@ import { SlicerName } from "../constants/slicers";
 
 
 interface MovieState {
+    firstMovie: Movie | null;
     selectedMovie: Movie | null;
 }
 
 const movieSliceState: MovieState = {
+    firstMovie: null,
     selectedMovie: null
 }
 
@@ -17,12 +19,15 @@ const movieSlice = createSlice({
     reducers: {
         setSelectedMovie: (state, { payload }: PayloadAction<Movie | null>) => {
             state.selectedMovie = payload;
+        },
+        setFirstMovie: (state, { payload }: PayloadAction<Movie | null>) => {
+            state.firstMovie = payload;
         }
     }
 });
 
-const { reducer: movieReducer, actions: { setSelectedMovie } } = movieSlice;
+const { reducer: movieReducer, actions: { setSelectedMovie, setFirstMovie } } = movieSlice;
 
 export type { MovieState };
 
-export { movieReducer, setSelectedMovie };
+export { movieReducer, setSelectedMovie, setFirstMovie };

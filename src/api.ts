@@ -1,5 +1,5 @@
-import { API_KEY } from '@env'
 import axios from "axios";
+import { TMDB_API_KEY } from "./settings";
 
 const setupInterceptor = () => {
     axios.interceptors.request.use(
@@ -9,9 +9,9 @@ const setupInterceptor = () => {
 
             newConfig.headers.Accept = 'application/json';
 
-            newConfig.headers.Authorization = `Bearer ${API_KEY}`;
+            newConfig.headers.Authorization = `Bearer ${TMDB_API_KEY}`;
 
-            console.log('API_KEY = ', API_KEY);
+            console.log('API_KEY = ', TMDB_API_KEY);
 
             return newConfig;
         },

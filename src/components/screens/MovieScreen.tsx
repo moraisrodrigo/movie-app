@@ -1,11 +1,13 @@
 import { FunctionComponent, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { Image, Text, View } from 'react-native';
-import { MovieRouteParams } from '../../constants/routes';
+import { AppRoute, MovieRouteParams } from '../../constants/routes';
 import { MovieContext, withMovieContext } from '../../controllers/MovieController';
 import { Cast, MoviesListResponse } from '../../types/responses';
 import { CastComponent } from '../elements/Cast';
 import { TMDB_IMG_URL } from '../../settings';
+import { MoviesList } from '../elements/MoviesList';
+import { Movie } from '../../types/movie';
 
 interface Props extends MovieRouteParams, MovieContext { }
 
@@ -22,52 +24,64 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	} = props;
 
     const [cast, setCast] = useState<Cast[]>([])
-    const [similarMovies, setSimilarMovies] = useState<MoviesListResponse | null>()
 
 	const prepare = async () => {
         const movieCredits = await getMovieCredits(movie.id);
-        const moviesSimilar = await getSimilarMovies(movie.id);
 
 		setCast(movieCredits?.cast ?? [])
-		setSimilarMovies(moviesSimilar)
 	};
 
 	useEffect(() => {
 		prepare();
-	}, []);
+	}, [movie]);
 
+	const getMovies = (page: number): Promise<MoviesListResponse | null> => getSimilarMovies(movie.id, page);
+	
+    const onMovieClick = (movie: Movie) => navigation.navigate(AppRoute.Movie, { movie });
+
+	const renderSimilar = () => {
+        return (
+            <ScrollView>
+                <MoviesList
+                    onMovieClick={onMovieClick}
+                    getMovies={(page) => getMovies(page)}
+                />
+            </ScrollView>
+        );
+    };
 
     return (
-		<ScrollView style={styles.screen}>
-            <Image source={{ uri: `${TMDB_IMG_URL}/w780/${(movie.backdrop_path || movie.poster_path)}` }} style={styles.imageBackdrop} />
-			<View style={styles.cardContainer}>
-				<Image source={{ uri: `${TMDB_IMG_URL}/w185/${movie.poster_path}` }} style={styles.cardImage} />
-				<View style={styles.cardDetails}>
-					<Text style={styles.cardTitle} numberOfLines={2}>
-						{movie.original_title}
-					</Text>
-					<View style={styles.cardGenre}>
-						<Text style={styles.cardGenreItem}>Action</Text>
-					</View>
-					<View style={styles.cardNumbers}>
-						<View style={styles.cardStar}>
-							<Text style={styles.cardStarRatings}>* 8.9</Text>
+		<SafeAreaView>
+			<ScrollView style={styles.screen}>
+				<Image source={{ uri: `${TMDB_IMG_URL}/w780/${(movie.backdrop_path || movie.poster_path)}` }} style={styles.imageBackdrop} />
+				<View style={styles.cardContainer}>
+					<Image source={{ uri: `${TMDB_IMG_URL}/w185/${movie.poster_path}` }} style={styles.cardImage} />
+					<View style={styles.cardDetails}>
+						<Text style={styles.cardTitle} numberOfLines={2}>{movie.original_title}</Text>
+						<View style={styles.cardGenre}>
+							<Text style={styles.cardGenreItem}>Action</Text>
 						</View>
-						<Text style={styles.cardRunningHours} />
+						<View style={styles.cardNumbers}>
+							<View style={styles.cardStar}>
+								<Text style={styles.cardStarRatings}>* 8.9</Text>
+							</View>
+							<Text style={styles.cardRunningHours} />
+						</View>
 					</View>
 				</View>
- 			</View>
-			<Text style={styles.cardDescription} numberOfLines={3}>
-				{movie.overview}
-			</Text>
-			<CastComponent cast={cast} navigation={navigation} />
-		</ScrollView>
+				<Text style={styles.cardDescription} numberOfLines={3}>{movie.overview}</Text>
+				<CastComponent cast={cast} navigation={navigation} />
+				<Text style={styles.bolText}>Similar Movies</Text>
+				{renderSimilar()}
+			</ScrollView>
+		</SafeAreaView>
     )
 };
 
 const styles = StyleSheet.create({
 	screen: {
 		padding: 10,
+		height: '100%'
 	},
 	imageBackdrop: {
         borderRadius: 10,
@@ -110,6 +124,10 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		marginTop: 5
 	},
+	bolText: {
+        color: 'white',
+        fontWeight: 'bold'
+    },
 	cardNumbers: {
 		flexDirection: 'row',
 		marginTop: 5

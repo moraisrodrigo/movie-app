@@ -5,7 +5,7 @@ import { MoviesListRequest } from "../types/requests";
 import { connect } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { Movie, SectionKey } from "../types/movie";
-import { setSelectedMovie } from "../slicers/movieSlice";
+import { setSelectedMovie, setFirstMovie } from "../slicers/movieSlice";
 import { MovieCreditsResponse, MovieDetails, MoviesListResponse } from "../types/responses";
 
 
@@ -19,8 +19,12 @@ class MovieController extends Component<Props> {
     state = {}
 
     getMoviesList = async (section: SectionKey, request: MoviesListRequest): Promise<MoviesListResponse | null> => {
+        const { dispatchSetFirstMovie } = this.props;
+
         try {
             const { data } = await axios.get<MoviesListResponse>(moviesUrl(section, { ...request }));
+
+            if (data.results.length > 0) dispatchSetFirstMovie(data.results[0])
 
             return data;
         } catch (e) {
@@ -49,9 +53,9 @@ class MovieController extends Component<Props> {
         }
 
     }
-    getSimilarMovies = async (movieId: number): Promise<MoviesListResponse | null> => {
+    getSimilarMovies = async (movieId: number, page: number): Promise<MoviesListResponse | null> => {
         try {
-            const { data } = await axios.get<MoviesListResponse>(movieSimilar(movieId));
+            const { data } = await axios.get<MoviesListResponse>(movieSimilar(movieId, page));
             return data;
         } catch (e) {
             console.warn("error fetching movies: ", JSON.parse(JSON.stringify(e)))
@@ -61,12 +65,13 @@ class MovieController extends Component<Props> {
     }
 
     render(): ReactNode {
-        const { children, selectedMovie } = this.props;
+        const { children, selectedMovie, firstMovie } = this.props;
 
         return (
             <Provider
                 value={{
                     selectedMovie,
+                    firstMovie,
                     getMoviesList: this.getMoviesList,
                     getMovieDetails: this.getMovieDetails,
                     getMovieCredits: this.getMovieCredits,
@@ -79,18 +84,21 @@ class MovieController extends Component<Props> {
     }
 }
 
-const mapStateToProps = ({ movie}: RootState) => ({
-    selectedMovie: movie.selectedMovie
+const mapStateToProps = ({ movie }: RootState) => ({
+    selectedMovie: movie.selectedMovie,
+    firstMovie: movie.firstMovie,
 });
 
 const mapDispachToProps = (dispatch: AppDispatch) => ({
-    dispatchSetSelectedMovie: (selectedMovie: Movie | null) => dispatch(setSelectedMovie(selectedMovie))
+    dispatchSetSelectedMovie: (selectedMovie: Movie | null) => dispatch(setSelectedMovie(selectedMovie)),
+    dispatchSetFirstMovie: (firstMovie: Movie | null) => dispatch(setFirstMovie(firstMovie))
 });
 
 const ConnectedMovieController = connect(mapStateToProps, mapDispachToProps)(MovieController);
 
 interface MovieContext extends Omit<InstanceType<typeof MovieController>, keyof Component> {
     selectedMovie: Movie | null;
+    firstMovie: Movie | null;
 }
 
 const { Consumer, Provider } = createContext<MovieContext | null>(null);

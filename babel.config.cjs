@@ -18,6 +18,7 @@ module.exports = function(api) {
         ],
         plugins: [
             ['@babel/plugin-transform-private-methods', { loose: true }],
+            ['module:react-native-dotenv'],
             ["@babel/plugin-transform-react-jsx", { runtime: "automatic" }]
         ]
     };

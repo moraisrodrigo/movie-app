@@ -9,7 +9,7 @@ const movieDetails = (movieId: number) => `${TMDB_URL}/movie/${movieId}?api_key=
 
 const movieCredits = (movieId: number) => `${TMDB_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`
 
-const movieSimilar = (movieId: number) => `${TMDB_URL}/movie/${movieId}/similar?api_key=${TMDB_API_KEY}`
+const movieSimilar = (movieId: number, page: number) => `${TMDB_URL}/movie/${movieId}/similar${objectToParams({ page, api_key: TMDB_API_KEY })}`
 
 const image500 = (path?: string) => path ? `https://image.tmdb.org/t/p/w500/${path}` : null;
 

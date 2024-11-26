@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
-import { DefaultTheme, NavigationContainer, Theme, useNavigation } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/native';
+import { AntDesign, MaterialCommunityIcons  } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppRoute, RootStackParamList } from './src/constants/routes';
 import { HomeScreen } from './src/components/screens/HomeScreen';
@@ -11,6 +12,13 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type TabBarIconProps = { 
+    focused: boolean;
+    color: string;
+    size: number;
+}
 
 const MyTheme: Theme = {
     ...DefaultTheme,
@@ -46,6 +54,22 @@ const getTitle = (route: string): ReactNode => {
     return <Text style={{ color: '#FFF' }}>{title}</Text>
 }
 
+const getTabBarIcon = ({ focused, color, size }: TabBarIconProps, routeName: string): ReactNode => {
+    const commonProps = { size, color, focused };
+
+    switch (routeName) {
+        case AppRoute.Profile:
+            return <AntDesign name="user" { ...commonProps } />;
+        case AppRoute.Movie:
+            return <MaterialCommunityIcons name="movie" { ...commonProps } />;
+            case AppRoute.MovieWrapper:
+                case AppRoute.MoviesList:
+            return <MaterialCommunityIcons name="movie-search" { ...commonProps } />;
+        case AppRoute.Home:
+            return <MaterialCommunityIcons name="home" { ...commonProps } />;
+    }
+}
+
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavigator<RootStackParamList>()
 
@@ -53,7 +77,7 @@ const App: React.FC = () => {
 
     const MoviesWrapper = (): ReactNode => {
         return (
-           <StackNavigator initialRouteName={AppRoute.MoviesList}>
+           <StackNavigator screenOptions={{ headerShown: false }} initialRouteName={AppRoute.MoviesList}>
               <StackScreen name={AppRoute.MoviesList} component={MoviesScreen} />
               <StackScreen name={AppRoute.Movie} component={MovieScreen} />
            </StackNavigator>
@@ -66,10 +90,12 @@ const App: React.FC = () => {
                 <NavigationContainer theme={MyTheme}>
                     <Navigator
                         initialRouteName={AppRoute.MovieWrapper}
-                        screenOptions={{ 
+                        screenOptions={({ route: { name: routeName } }) => ({
+                            headerShown: false,
                             tabBarLabel: ({ children }) => getTitle(children),
                             headerTitle: ({ children }) => getTitle(children),
-                        }}
+                            tabBarIcon: (props) => getTabBarIcon(props, routeName),
+                        })}
                     >
                         <Screen name={AppRoute.Home} component={HomeScreen} />
                         <Screen name={AppRoute.MovieWrapper} component={MoviesWrapper} />

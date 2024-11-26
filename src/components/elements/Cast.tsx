@@ -13,40 +13,41 @@ type Props = {
 
 const CastComponent: FunctionComponent<Props> = (props: Props) => {
 
-    const { cast, navigation } = props;
+    const { cast } = props;
+
+    const renderName = (name: string): string => name.length > 10 ? name.slice(0, 10) + '...' : name;
+
+    const renderCast = ({ character, original_name, profile_path }: Cast, index: number) => (
+        <TouchableOpacity
+            key={index}
+            style={styles.person}
+        >
+            <View>
+                <Image
+                    style={styles.avatar}
+                    source={{ uri: image185(profile_path) || fallbackPersonImage }}
+                />
+            </View>
+            <Text style={styles.name} >
+                {renderName(character)}
+            </Text>
+            <Text style={styles.name} >
+                {renderName(original_name)}
+            </Text>
+        </TouchableOpacity>
+    );
 
     return (
-        <View
-        style={styles.view}
-        // className="my-6"
-        >
+        <View style={styles.view}>
             <Text style={styles.topCastTitle}>Top Cast</Text>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 15 }}>
-                {cast && cast.map(({ character, original_name, profile_path }, index: number) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={styles.person}
-                    >
-                        <View>
-                            <Image
-                                style={styles.avatar}
-                                source={{ uri: image185(profile_path) || fallbackPersonImage }}
-                            />
-                        </View>
-                        <Text style={{ color: 'white' }}>
-                            {character.length > 10 ? character.slice(0, 10) + '...' : character}
-                        </Text>
-                        <Text style={{ color: 'white' }}>
-                            {original_name.length > 10 ? original_name.slice(0, 10) + '...' : original_name}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+                {cast && cast.map(renderCast)}
             </ScrollView>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -65,6 +66,9 @@ const styles = StyleSheet.create({
     topCastTitle: {
         color: 'white',
         fontWeight: 'bold'
+    },
+    name: {
+        color: 'white'
     }
 });
 
