@@ -6,8 +6,9 @@ import { MovieContext, withMovieContext } from '../../controllers/MovieControlle
 import { Cast, MoviesListResponse } from '../../types/responses';
 import { CastComponent } from '../elements/Cast';
 import { TMDB_IMG_URL } from '../../settings';
+import { AuthenticationContext, withAuthenticationContext } from '../../controllers/AuthenticationController';
 
-interface Props extends MovieRouteParams, MovieContext { }
+interface Props extends AuthenticationContext { }
 
 const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
@@ -140,4 +141,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export const PersonScreen =  withMovieContext(PersonScreenComponent);
+export const PersonScreen =  withAuthenticationContext(PersonScreenComponent);

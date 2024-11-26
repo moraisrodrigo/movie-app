@@ -1,7 +1,7 @@
 import axios from "axios";
 import { TMDB_API_TOKEN } from "./settings";
 
-const setupInterceptor = () => {
+const setupInterceptor = (sessionId: string | null) => {
     axios.interceptors.request.use(
         (config) => {
 
@@ -11,15 +11,17 @@ const setupInterceptor = () => {
 
             newConfig.headers.Authorization = ` Bearer ${TMDB_API_TOKEN}`;
 
+            if (sessionId) newConfig.params = { ...newConfig.params, session_id: sessionId }
+
             return newConfig;
         },
         (err) => Promise.reject(err),
     );
 };
 
-const setup = () => {
+const setup = (sessionId: string | null) => {
     axios.create({ withCredentials: true });
-    setupInterceptor();
+    setupInterceptor(sessionId);
 }
 
 export { setup };

@@ -1,1 +1,4 @@
-import Config from 'react-native-config';
+
+const SessionIdKey = 'tmdb_session_id'
+
+export { SessionIdKey }

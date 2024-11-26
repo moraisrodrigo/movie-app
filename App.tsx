@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode, useEffect, useState } from 'react';
 import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/native';
 import { AntDesign, MaterialCommunityIcons  } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,8 +13,9 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { getSessionId } from './src/secureStore';
 
-type TabBarIconProps = { 
+type TabBarIconProps = {
     focused: boolean;
     color: string;
     size: number;
@@ -73,8 +74,20 @@ const getTabBarIcon = ({ focused, color, size }: TabBarIconProps, routeName: str
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavigator<RootStackParamList>()
 
-const App: React.FC = () => {
-    setup();
+const App: FunctionComponent = () => {
+    const [isPrepared, setIsPrepared] = useState(false);
+
+    const prepare = () => {
+        const sessionId = getSessionId();
+        setup(sessionId);
+        setIsPrepared(true);
+    }
+
+    useEffect(() => {
+        prepare();
+    }, []);
+
+    if (!isPrepared) return <></>;
 
     const MoviesWrapper = (): ReactNode => {
         return (
