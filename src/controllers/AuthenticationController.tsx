@@ -35,6 +35,8 @@ class AuthenticationController extends Component<Props> {
             dispatchSetAuthenticatedUser({ ...data })
 
         } catch {
+            setSessionId(null);
+            dispatchSetAuthenticatedUser(null)
             return null;
         }
     }
