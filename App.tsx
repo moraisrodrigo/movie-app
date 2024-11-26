@@ -8,11 +8,11 @@ import { ProfileScreen } from './src/components/screens/ProfileScreen';
 import { store, persistor } from './src/store';
 import { MoviesScreen } from './src/components/screens/MoviesScreen';
 import { MovieScreen } from './src/components/screens/MovieScreen';
+import { setup } from './src/api';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type TabBarIconProps = { 
     focused: boolean;
@@ -74,6 +74,7 @@ const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavigator<RootStackParamList>()
 
 const App: React.FC = () => {
+    setup();
 
     const MoviesWrapper = (): ReactNode => {
         return (

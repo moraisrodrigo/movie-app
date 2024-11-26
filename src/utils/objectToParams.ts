@@ -1,5 +1,3 @@
-import { TMDB_API_KEY } from '../settings';
-
 const addParam = (previousParams: string, paramName: string, value: string): string => {
     const newParam = value.trim() === '' ? paramName : `${paramName}=${encodeURIComponent(value)}`
     
@@ -17,7 +15,7 @@ const objectToParams = (request: Record<string, unknown>): string => {
         params = addParam(params, paramName, String(value));
     })
 
-    return `?api_key=${TMDB_API_KEY}&${params}`;
+    return `?${params}`;
 }
 
 export { objectToParams };
