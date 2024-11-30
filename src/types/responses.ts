@@ -1,10 +1,14 @@
-import { Movie } from "./movie";
+import { Genre, Movie } from "./movie";
 
 type MoviesListResponse = {
     page: number;
     results: Movie[];
     total_pages: number;
     total_results: number;
+}
+
+type GenresListResponse = {
+    genres: Genre[]
 }
 
 type MovieDetails = Movie & {
@@ -65,5 +69,6 @@ export type {
     MovieVideosResult,
     MovieVideo,
     MovieCreditsResponse,
-    Cast
+    Cast,
+    GenresListResponse,
 };

@@ -1,12 +1,12 @@
 import { Component, ComponentType, createContext, FunctionComponent, ReactNode } from "react";
 import axios from "axios";
-import { movieCredits, movieDetails, movieSimilar, moviesUrl, movieVideos } from "../services/movies";
-import { MoviesListRequest } from "../types/requests";
+import { discoverURL, genresURL, movieCredits, movieDetails, movieSimilar, moviesUrl, movieVideos } from "../services/movies";
+import { MovieListSearchRequest, MoviesListRequest } from "../types/requests";
 import { connect } from "react-redux";
 import { AppDispatch, RootState } from "../store";
-import { Movie, SectionKey } from "../types/movie";
+import { Genre, Movie, SectionKey } from "../types/movie";
 import { setSelectedMovie, setFirstMovie } from "../slicers/movieSlice";
-import { MovieCreditsResponse, MovieDetails, MoviesListResponse, MovieVideosResult } from "../types/responses";
+import { GenresListResponse, MovieCreditsResponse, MovieDetails, MoviesListResponse, MovieVideosResult } from "../types/responses";
 
 
 interface OwnProps {
@@ -29,6 +29,26 @@ class MovieController extends Component<Props> {
             return data;
         } catch (e) {
             return null;
+        }
+    }
+
+    getMoviesSearch = async (request: MovieListSearchRequest): Promise<MoviesListResponse | null> => {
+        try {
+            const { data } = await axios.get<MoviesListResponse>(discoverURL(request));
+
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    getGenres = async (): Promise<Genre[]> => {
+        try {
+            const { data: { genres } } = await axios.get<GenresListResponse>(genresURL());
+
+            return genres;
+        } catch (e) {
+            return [];
         }
     }
 
@@ -78,6 +98,8 @@ class MovieController extends Component<Props> {
                     selectedMovie,
                     firstMovie,
                     getMoviesList: this.getMoviesList,
+                    getMoviesSearch: this.getMoviesSearch,
+                    getGenres: this.getGenres,
                     getMovieDetails: this.getMovieDetails,
                     getMovieVideos: this.getMovieVideos,
                     getMovieCredits: this.getMovieCredits,

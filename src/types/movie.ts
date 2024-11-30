@@ -16,6 +16,11 @@ interface Movie {
     vote_count: number;
 }
 
+interface Genre {
+    id: number,
+    name: string
+}
+
 enum SectionKey {
     NOW_PLAYING = 'now_playing',
     POPULAR = 'popular',
@@ -25,4 +30,7 @@ enum SectionKey {
 
 export { SectionKey };
 
-export type { Movie };
+export type {
+    Movie,
+    Genre
+};

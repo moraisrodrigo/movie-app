@@ -9,7 +9,6 @@ import { image342 } from '../../services/movies';
 import { fallbackPersonImage } from '../../constants/misc';
 import { MoviesList } from '../elements/MoviesList';
 import { MoviesListResponse } from '../../types/responses';
-import { FlatList } from 'react-native-gesture-handler';
 import { Movie } from '../../types/movie';
 
 interface Props extends PersonRouteParams, PersonContext { }
@@ -43,10 +42,7 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	};
 
 	const prepare = async (): Promise<void> => {
-        const personDetails: Person | null = await getPersonDetails(personId);
-
-		console.log(personDetails);
-		
+        const personDetails: Person | null = await getPersonDetails(personId);		
 
 		setPerson(personDetails);
 		setIsLoading(false);

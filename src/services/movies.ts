@@ -1,11 +1,15 @@
 import { TMDB_IMG_URL, TMDB_URL } from '../settings';
 import { SectionKey } from '../types/movie';
-import { MoviesListRequest } from '../types/requests';
+import { MovieListSearchRequest, MoviesListRequest } from '../types/requests';
 import { objectToParams } from '../utils/objectToParams';
 
 const moviesUrl = (section: SectionKey, request: MoviesListRequest) => `${TMDB_URL}/movie/${section}${objectToParams(request)}`
 
 const movieDetails = (movieId: number) => `${TMDB_URL}/movie/${movieId}`
+
+const genresURL = () => `${TMDB_URL}/genre/movie/list`
+
+const discoverURL = (request: MovieListSearchRequest) => `${TMDB_URL}/discover/movie${objectToParams(request)}`
 
 const movieCredits = (movieId: number) => `${TMDB_URL}/movie/${movieId}/credits`
 
@@ -25,6 +29,8 @@ export {
     movieVideos,
     movieCredits,
     movieSimilar,
+    genresURL,
+    discoverURL,
     image500,
     image342,
     image185,

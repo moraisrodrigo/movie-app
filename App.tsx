@@ -49,9 +49,6 @@ const getTitle = (route: string): ReactNode => {
         case AppRoute.MoviesList:
             title = 'Movies'
         break;
-        case AppRoute.NotFound:
-            title = 'Ups! Not found'
-        break;
     }
     return <Text style={{ color: '#FFF' }}>{title}</Text>
 }

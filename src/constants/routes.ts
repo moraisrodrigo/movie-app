@@ -9,7 +9,6 @@ enum AppRoute {
     MovieWrapper = 'movie-wrapper',
     Movie = 'movie',
     MoviesList = 'movies-list',
-    NotFound = 'not-found',
 }
 
 type MovieScreenRouteParams = {
@@ -20,8 +19,9 @@ type PersonScreenRouteParams = {
     personId: string;
 }
 
-type MultipleScreenTab<AppRoute> = {
-    screen: AppRoute;
+type MultipleScreenTab<Screen extends AppRoute> = {
+    screen: Screen;
+    params: RootStackParamList[Screen]
 }
 
 type RootStackParamList  = {
@@ -29,7 +29,7 @@ type RootStackParamList  = {
     [AppRoute.Index]: undefined,
     [AppRoute.Person]: PersonScreenRouteParams,
     [AppRoute.Profile]: undefined,
-    [AppRoute.MovieWrapper]: MultipleScreenTab<AppRoute.Movie | AppRoute.MoviesList>,
+    [AppRoute.MovieWrapper]: MultipleScreenTab<AppRoute.MoviesList | AppRoute.Movie>,
     [AppRoute.Movie]: MovieScreenRouteParams,
     [AppRoute.MoviesList]: undefined,
 };
