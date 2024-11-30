@@ -1,12 +1,12 @@
 import { Component, ComponentType, createContext, FunctionComponent, ReactNode } from "react";
 import axios from "axios";
-import { movieCredits, movieDetails, movieSimilar, moviesUrl } from "../services/movies";
+import { movieCredits, movieDetails, movieSimilar, moviesUrl, movieVideos } from "../services/movies";
 import { MoviesListRequest } from "../types/requests";
 import { connect } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { Movie, SectionKey } from "../types/movie";
 import { setSelectedMovie, setFirstMovie } from "../slicers/movieSlice";
-import { MovieCreditsResponse, MovieDetails, MoviesListResponse } from "../types/responses";
+import { MovieCreditsResponse, MovieDetails, MoviesListResponse, MovieVideosResult } from "../types/responses";
 
 
 interface OwnProps {
@@ -28,7 +28,6 @@ class MovieController extends Component<Props> {
 
             return data;
         } catch (e) {
-            console.warn("error fetching movies: ", JSON.parse(JSON.stringify(e)))
             return null;
         }
     }
@@ -38,30 +37,36 @@ class MovieController extends Component<Props> {
             const { data } = await axios.get<MovieDetails>(movieDetails(movieId));
             return data;
         } catch (e) {
-            console.warn("error fetching movies: ", JSON.parse(JSON.stringify(e)))
             return null;
         }
-
     }
+
     getMovieCredits = async (movieId: number): Promise<MovieCreditsResponse | null> => {
         try {
             const { data } = await axios.get<MovieCreditsResponse>(movieCredits(movieId));
             return data;
         } catch (e) {
-            console.warn("error fetching movies: ", JSON.parse(JSON.stringify(e)))
+            return null;
+        }
+    }
+
+    getMovieVideos = async (movieId: number): Promise<MovieVideosResult | null> => {
+        try {
+            const { data } = await axios.get<MovieVideosResult>(movieVideos(movieId));
+            return data;
+        } catch (e) {
             return null;
         }
 
     }
+
     getSimilarMovies = async (movieId: number, page: number): Promise<MoviesListResponse | null> => {
         try {
             const { data } = await axios.get<MoviesListResponse>(movieSimilar(movieId, page));
             return data;
         } catch (e) {
-            console.warn("error fetching movies: ", JSON.parse(JSON.stringify(e)))
             return null;
         }
-
     }
 
     render(): ReactNode {
@@ -74,6 +79,7 @@ class MovieController extends Component<Props> {
                     firstMovie,
                     getMoviesList: this.getMoviesList,
                     getMovieDetails: this.getMovieDetails,
+                    getMovieVideos: this.getMovieVideos,
                     getMovieCredits: this.getMovieCredits,
                     getSimilarMovies: this.getSimilarMovies,
                 }}

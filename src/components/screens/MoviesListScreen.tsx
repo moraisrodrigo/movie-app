@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import { MovieContext, withMovieContext } from "../../controllers/MovieController";
 import { Movie, SectionKey } from "../../types/movie";
 import { AppRoute, MoviesListRouteParams } from "../../constants/routes";
@@ -9,45 +9,43 @@ import { MoviesListResponse } from "../../types/responses";
 
 interface Props extends MovieContext, MoviesListRouteParams {}
 
-const MoviesScreenComponent: FunctionComponent<Props> = (props: Props) => {
+const MoviesListScreenComponent: FunctionComponent<Props> = (props: Props) => {
     const { navigation: { navigate }, firstMovie, getMoviesList } = props;
 
-    const onMovieClick = (movie: Movie) => navigate(AppRoute.Movie, { movie });
+    const onMovieClick = (movie: Movie): void => navigate(AppRoute.Movie, { movie });
 
     const getMovies = (sectionKey: SectionKey, page: number): Promise<MoviesListResponse | null> => {
         return getMoviesList(sectionKey, { page });
     }
 
-    const renderTitle = (sectionKey: SectionKey) => {
+    const getTitle = (sectionKey: SectionKey): string => {
         let title: string = 'Movies';
 
         switch (sectionKey) {
             case SectionKey.NOW_PLAYING:
-                title = "NOW_PLAYING"
+                title = "Now Playing"
                 break;
             case SectionKey.POPULAR:
-                title = "POPULAR"
+                title = "Popular"
                 break;
             case SectionKey.TOP_RATED:
-                title = "TOP_RATED"
+                title = "Top rated"
                 break;
             case SectionKey.UPCOMING:
-                title = "UPCOMING"
+                title = "Upcoming"
                 break;
             default:
                 break;
         }
 
-        return (
-            <Text style={styles.listTitle}>{title}</Text>
-        );
+        return title;
     };
 
     const renderLists = () => Object.values(SectionKey).map((key, index) => {
         return (
-            <ScrollView key={`${index}-${key}`}>
-                {renderTitle(key)}
+            <ScrollView key={`${index}-${key}`} style={styles.list}>
                 <MoviesList
+                    title={getTitle(key)}
                     onMovieClick={onMovieClick}
                     getMovies={(page) => getMovies(key, page)}
                 />
@@ -75,11 +73,9 @@ const styles = StyleSheet.create({
 		padding: 10,
 		height: '100%'
 	},
-    listTitle: {
-		marginTop: 10,
-        color: "#FFF",
-        textAlign: 'center'
-    },
+	list: {
+        marginVertical: 15,
+	},
     horizontalList: {
         flexGrow: 1,
         display: "flex",
@@ -87,4 +83,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export const MoviesScreen = withMovieContext(MoviesScreenComponent);
+export const MoviesListScreen = withMovieContext(MoviesListScreenComponent);

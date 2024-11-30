@@ -1,144 +1,185 @@
-import { FunctionComponent, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { Image, Text, View } from 'react-native';
-import { MovieRouteParams } from '../../constants/routes';
-import { MovieContext, withMovieContext } from '../../controllers/MovieController';
-import { Cast, MoviesListResponse } from '../../types/responses';
-import { CastComponent } from '../elements/Cast';
-import { TMDB_IMG_URL } from '../../settings';
-import { AuthenticationContext, withAuthenticationContext } from '../../controllers/AuthenticationController';
+import { FunctionComponent, ReactNode, useEffect, useState } from 'react';
+import { Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from 'react-native';
+import { PersonContext, withPersonContext } from '../../controllers/PersonController';
+import { Person } from '../../types/user';
+import { AppRoute, PersonRouteParams } from '../../constants/routes';
+import { Spinner } from '../elements/Spinner';
+import { image342 } from '../../services/movies';
+import { fallbackPersonImage } from '../../constants/misc';
+import { MoviesList } from '../elements/MoviesList';
+import { MoviesListResponse } from '../../types/responses';
+import { FlatList } from 'react-native-gesture-handler';
+import { Movie } from '../../types/movie';
 
-interface Props extends AuthenticationContext { }
+interface Props extends PersonRouteParams, PersonContext { }
 
 const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
 		route: {
 			params: {
-				movie,
+				personId,
 			}
 		},
 		navigation,
-		getMovieCredits,
-		getSimilarMovies
+		getPersonDetails,
+		getPersonMovies,
 	} = props;
 
-    const [cast, setCast] = useState<Cast[]>([])
-    const [similarMovies, setSimilarMovies] = useState<MoviesListResponse | null>()
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [person, setPerson] = useState<Person | null>(null);
 
-	const prepare = async () => {
-        const movieCredits = await getMovieCredits(movie.id);
-        const moviesSimilar = await getSimilarMovies(movie.id);
+	const onMovieClick = (movie: Movie): void => navigation.navigate(AppRoute.Movie, { movie });
 
-		setCast(movieCredits?.cast ?? [])
-		setSimilarMovies(moviesSimilar)
+	const getMovies = async (): Promise<MoviesListResponse> => {
+		const results: Movie[] = await getPersonMovies(personId);
+
+		return {
+			page: 0,
+			results,
+			total_pages: 1,
+			total_results: results.length
+		}
 	};
+
+	const prepare = async (): Promise<void> => {
+        const personDetails: Person | null = await getPersonDetails(personId);
+
+		console.log(personDetails);
+		
+
+		setPerson(personDetails);
+		setIsLoading(false);
+	};
+
+	const renderMovies = (): ReactNode => {
+        return (
+            <ScrollView style={styles.moviesWrapper}>
+                <MoviesList
+					title='Movies'
+                    onMovieClick={onMovieClick}
+                    getMovies={getMovies}
+                />
+            </ScrollView>
+        );
+    };
 
 	useEffect(() => {
 		prepare();
 	}, []);
 
+	if (isLoading || !person) return <Text style={{ backgroundColor: '#FF0000' }}>asd</Text>
+	if (isLoading || !person) return <Spinner />
 
-    return (
-		<ScrollView style={styles.screen}>
-            <Image source={{ uri: `${TMDB_IMG_URL}/w780/${(movie.backdrop_path || movie.poster_path)}` }} style={styles.imageBackdrop} />
-			<View style={styles.cardContainer}>
-				<Image source={{ uri: `${TMDB_IMG_URL}/w185/${movie.poster_path}` }} style={styles.cardImage} />
-				<View style={styles.cardDetails}>
-					<Text style={styles.cardTitle} numberOfLines={2}>
-						{movie.original_title}
-					</Text>
-					<View style={styles.cardGenre}>
-						<Text style={styles.cardGenreItem}>Action</Text>
-					</View>
-					<View style={styles.cardNumbers}>
-						<View style={styles.cardStar}>
-							<Text style={styles.cardStarRatings}>* 8.9</Text>
+	return (
+		<SafeAreaView>
+			<ScrollView style={styles.screen}>
+				<View style={styles.secondContainer}>
+					<Image
+					style={styles.imageView}
+					source={{ uri: image342(person.profile_path) || fallbackPersonImage }}
+					/>
+					<View style={{ flexWrap: "wrap", flex: 1 }}>
+					<View style={styles.artistInfoContainer}>
+						<Text style={[ styles.artistName, { color:'white' }]}>
+						{person.name}
+						</Text>
+						<View style={styles.otherInfoContainer}>
+						<Text style={[ styles.titleContent, { color:'white' }]}>
+							known for
+						</Text>
+						<Text style={[ styles.titleData, { color:'white' }]}>
+							{person.known_for_department}
+						</Text>
 						</View>
-						<Text style={styles.cardRunningHours} />
+						<View style={styles.otherInfoContainer}>
+						<Text style={[ styles.titleContent, { color:'white' }]}>
+							Gender
+						</Text>
+						<Text style={[ styles.titleData, { color:'white' }]}>
+							{person.gender === 1 ? "Female" : "Male"}
+						</Text>
+						</View>
+						<View style={styles.otherInfoContainer}>
+						<Text style={[ styles.titleContent, { color:'white' }]}>
+							Birthday
+						</Text>
+						<Text
+							style={[ styles.titleData, { color:'white' }]}>
+							{person.birthday}
+						</Text>
+						</View>
+						<View style={styles.otherInfoContainer}>
+						<Text style={[ styles.titleContent, { color:'white' }]} >
+							Place of Birth
+						</Text>
+						<Text style={[ styles.titleData, { color:'white' }]}>
+							{person.place_of_birth}
+						</Text>
+						</View>
+					</View>
 					</View>
 				</View>
- 			</View>
-			<Text style={styles.cardDescription} numberOfLines={3}>
-				{movie.overview}
-			</Text>
-			<CastComponent cast={cast} navigation={navigation} />
-		</ScrollView>
-    )
+				{renderMovies()}
+				<View style={styles.biographyWrapper}>
+					<Text
+						style={[styles.biography, { color:'white' }]}
+					>
+						Biography
+					</Text>
+					<Text style={{ color:'white' }}>
+						{person.biography}
+					</Text>
+				</View>
+			</ScrollView>
+		</SafeAreaView>
+	  );
 };
 
 const styles = StyleSheet.create({
 	screen: {
 		padding: 10,
+		marginBottom: 20,
 	},
-	imageBackdrop: {
-        borderRadius: 10,
-		height: 248,
-		backgroundColor: 'black'
+	moviesWrapper: {
 	},
-	cardContainer: {
-		position: 'absolute',
-		top: 32,
-		right: 16,
-		left: 16,
-		flexDirection: 'row'
+	mainView: {
+	  	flex: 1,
+	  	margin: 8,
 	},
-	cardImage: {
-		height: 184,
-		width: 135,
-		borderRadius: 3
+	imageView: {
+	  	height: 300,
+		width: 190,
+		resizeMode: "stretch",
+		borderRadius: 16,
 	},
-	cardDetails: {
-		justifyContent: 'center',
-		paddingLeft: 10,
-		flex: 1
+	secondContainer: {
+		marginBottom: 16,
+	  	flexDirection: "row",
 	},
-	cardTitle: {
-		color: 'white',
-		fontSize: 19,
-		fontWeight: '500',
-		paddingTop: 10
+	artistInfoContainer: {
+	  	paddingLeft: 16,
 	},
-	cardGenre: {
-		flexDirection: 'row'
+	artistName: {
+	  	fontSize: 24,
 	},
-	cardGenreItem: {
-		fontSize: 11,
-		marginRight: 5,
-		color: 'white'
+	otherInfoContainer: {
+	  	marginTop: 8,
 	},
-	cardDescription: {
-		color: '#f7f7f7',
-		fontSize: 13,
-		marginTop: 5
+	titleContent: {
+	  	fontSize: 13,
 	},
-	cardNumbers: {
-		flexDirection: 'row',
-		marginTop: 5
+	titleData: {
+	  	fontSize: 16,
 	},
-	cardStar: {
-		flexDirection: 'row'
+	biography: {
+	  	fontSize: 24,
+		marginTop: 16,
+		marginBottom: 8,
 	},
-	cardStarRatings: {
-		marginLeft: 5,
-		fontSize: 12,
-		color: 'white'
+	biographyWrapper: {
+		marginBottom: 16,
 	},
-	cardRunningHours: {
-		marginLeft: 5,
-		fontSize: 12
-	},
-	viewButton: {
-		justifyContent: 'center',
-		padding: 10,
-		borderRadius: 3,
-		backgroundColor: '#EA0000',
-		width: 100,
-		height: 30,
-		marginTop: 10
-	},
-	viewButtonText: {
-		color: 'white'
-	}
 });
 
-export const PersonScreen =  withAuthenticationContext(PersonScreenComponent);
+export const PersonScreen =  withPersonContext(PersonScreenComponent);

@@ -3,9 +3,9 @@ import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/nati
 import { AntDesign, MaterialCommunityIcons  } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppRoute, RootStackParamList } from './constants/routes';
-import { HomeScreen } from './components/screens/HomeScreen';
+import { HomeScreen } from './components/screens/SearchScreen';
 import { ProfileScreen } from './components/screens/ProfileScreen';
-import { MoviesScreen } from './components/screens/MoviesScreen';
+import { MoviesScreen } from './components/screens/MoviesListScreen';
 import { MovieScreen } from './components/screens/MovieScreen';
 import { setup } from './api';
 import { Text } from 'react-native';

@@ -8,7 +8,7 @@ const createSessionUrl = () => `${TMDB_URL}/authentication/session/new`;
 
 const deleteSessionUrl = () => `${TMDB_URL}/authentication/session`;
 
-const authenticateUrl = (token: string) => `${TMDB_URL_SITE}authenticate/${token}`;
+const authenticateUrl = (token: string) => `${TMDB_URL_SITE}/authenticate/${token}`;
 
 const accountUrl = () => `${TMDB_URL}/account`;
 

@@ -1,10 +1,10 @@
 import { FunctionComponent } from "react";
 import { Button, Text, View } from "react-native";
-import { AppRoute, HomeRouteParams } from "../../constants/routes";
+import { AppRoute, SearchRouteParams } from "../../constants/routes";
 
-type Props = HomeRouteParams;
+type Props = SearchRouteParams;
 
-const HomeScreen: FunctionComponent<Props> = (props: Props) => {
+const SearchScreen: FunctionComponent<Props> = (props: Props) => {
     const { navigation: { navigate } } = props;
 
     return (
@@ -18,4 +18,4 @@ const HomeScreen: FunctionComponent<Props> = (props: Props) => {
     );
 }
 
-export { HomeScreen };
+export { SearchScreen };

@@ -3,10 +3,11 @@ import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/nati
 import { AntDesign, MaterialCommunityIcons  } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppRoute, RootStackParamList } from './src/constants/routes';
-import { HomeScreen } from './src/components/screens/HomeScreen';
+import { SearchScreen } from './src/components/screens/SearchScreen';
 import { ProfileScreen } from './src/components/screens/ProfileScreen';
+import { PersonScreen } from './src/components/screens/PersonScreen';
 import { store, persistor } from './src/store';
-import { MoviesScreen } from './src/components/screens/MoviesScreen';
+import { MoviesListScreen } from './src/components/screens/MoviesListScreen';
 import { MovieScreen } from './src/components/screens/MovieScreen';
 import { setup } from './src/api';
 import { Provider } from 'react-redux';
@@ -35,8 +36,8 @@ const MyTheme: Theme = {
 const getTitle = (route: string): ReactNode => {
     let title: string = 'Movie App';
     switch (route) {
-        case AppRoute.Home:
-            title = 'Home'
+        case AppRoute.Search:
+            title = 'Search'
         break;
         case AppRoute.Profile:
             title = 'Profile'
@@ -62,12 +63,12 @@ const getTabBarIcon = ({ focused, color, size }: TabBarIconProps, routeName: str
         case AppRoute.Profile:
             return <AntDesign name="user" { ...commonProps } />;
         case AppRoute.Movie:
-            return <MaterialCommunityIcons name="movie" { ...commonProps } />;
+            return <MaterialCommunityIcons name="movie-play" { ...commonProps } />;
             case AppRoute.MovieWrapper:
                 case AppRoute.MoviesList:
-            return <MaterialCommunityIcons name="movie-search" { ...commonProps } />;
-        case AppRoute.Home:
-            return <MaterialCommunityIcons name="home" { ...commonProps } />;
+            return <MaterialCommunityIcons name="movie" { ...commonProps } />;
+        case AppRoute.Search:
+            return <AntDesign name="search1" { ...commonProps } />;
     }
 }
 
@@ -92,8 +93,9 @@ const App: FunctionComponent = () => {
     const MoviesWrapper = (): ReactNode => {
         return (
            <StackNavigator screenOptions={{ headerShown: false }} initialRouteName={AppRoute.MoviesList}>
-              <StackScreen name={AppRoute.MoviesList} component={MoviesScreen} />
+              <StackScreen name={AppRoute.MoviesList} component={MoviesListScreen} />
               <StackScreen name={AppRoute.Movie} component={MovieScreen} />
+              <StackScreen name={AppRoute.Person} component={PersonScreen} />
            </StackNavigator>
         );
      }
@@ -112,8 +114,8 @@ const App: FunctionComponent = () => {
                             tabBarIcon: (props) => getTabBarIcon(props, routeName),
                         })}
                     >
-                        <Screen name={AppRoute.Home} component={HomeScreen} />
                         <Screen name={AppRoute.MovieWrapper} component={MoviesWrapper} />
+                        <Screen name={AppRoute.Search} component={SearchScreen} />
                         <Screen name={AppRoute.Profile} component={ProfileScreen} />
                     </Navigator>
                 </NavigationContainer>

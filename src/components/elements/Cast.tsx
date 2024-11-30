@@ -13,12 +13,15 @@ type Props = {
 
 const CastComponent: FunctionComponent<Props> = (props: Props) => {
 
-    const { cast } = props;
+    const { cast, navigation: { navigate } } = props;
+
+    const onPersonClick = (personId: string) => navigate(AppRoute.Person, { personId })
 
     const renderName = (name: string): string => name.length > 10 ? name.slice(0, 10) + '...' : name;
 
-    const renderCast = ({ character, original_name, profile_path }: Cast, index: number) => (
+    const renderCast = ({ character, original_name, profile_path, id }: Cast, index: number) => (
         <TouchableOpacity
+            onPress={() => onPersonClick(String(id))}
             key={index}
             style={styles.person}
         >

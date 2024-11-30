@@ -1,14 +1,14 @@
-import { FunctionComponent, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { Image, Text, View } from 'react-native';
+import { FunctionComponent, ReactNode, useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from 'react-native';
 import { AppRoute, MovieRouteParams } from '../../constants/routes';
 import { MovieContext, withMovieContext } from '../../controllers/MovieController';
-import { Cast, MoviesListResponse } from '../../types/responses';
+import { Cast, MovieCreditsResponse, MoviesListResponse, MovieVideo, MovieVideosResult } from '../../types/responses';
 import { CastComponent } from '../elements/Cast';
-import { TMDB_IMG_URL } from '../../settings';
 import { MoviesList } from '../elements/MoviesList';
 import { Movie } from '../../types/movie';
 import { MovieCover } from '../elements/MovieCover';
+import { VideoPlayer } from '../elements/VideoPlayer';
 
 interface Props extends MovieRouteParams, MovieContext { }
 
@@ -21,15 +21,19 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 		},
 		navigation,
 		getMovieCredits,
-		getSimilarMovies
+		getSimilarMovies,
+		getMovieVideos,
 	} = props;
 
     const [cast, setCast] = useState<Cast[]>([])
+    const [videos, setVideos] = useState<MovieVideo[]>([]);
 
-	const prepare = async () => {
-        const movieCredits = await getMovieCredits(movie.id);
+	const prepare = async (): Promise<void> => {
+        const movieCredits: MovieCreditsResponse | null = await getMovieCredits(movie.id);
+        const movieVideos: MovieVideosResult | null = await getMovieVideos(movie.id);
 
-		setCast(movieCredits?.cast ?? [])
+		setCast(movieCredits?.cast || [])
+		setVideos(movieVideos?.results || [])
 	};
 
 	useEffect(() => {
@@ -37,13 +41,14 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	}, [movie]);
 
 	const getMovies = (page: number): Promise<MoviesListResponse | null> => getSimilarMovies(movie.id, page);
-	
-    const onMovieClick = (movie: Movie) => navigation.navigate(AppRoute.Movie, { movie });
 
-	const renderSimilar = () => {
+    const onMovieClick = (movie: Movie): void => navigation.navigate(AppRoute.Movie, { movie });
+
+	const renderSimilar = (): ReactNode => {
         return (
-            <ScrollView>
+            <ScrollView style={styles.similarWrapper}>
                 <MoviesList
+					title='Similar Movies'
                     onMovieClick={onMovieClick}
                     getMovies={(page) => getMovies(page)}
                 />
@@ -51,13 +56,28 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
         );
     };
 
+	const renderTrailers = (): ReactNode => {
+		if (!videos || videos.length === 0) return null;
+
+		return (
+			<View style={styles.trailerWrapper}>
+				<Text style={styles.trailerTitle}>Trailer</Text>
+				<VideoPlayer video={videos[0]} />
+			</View>
+		)
+	}
+
+	const renderCast = () => {
+		return <CastComponent cast={cast} navigation={navigation} />;
+	}
+
     return (
 		<SafeAreaView>
 			<ScrollView style={styles.screen}>
 				<MovieCover movie={movie} />
 				<Text style={styles.cardDescription} numberOfLines={3}>{movie.overview}</Text>
-				<CastComponent cast={cast} navigation={navigation} />
-				<Text style={styles.bolText}>Similar Movies</Text>
+				{renderCast()}
+				{renderTrailers()}
 				{renderSimilar()}
 			</ScrollView>
 		</SafeAreaView>
@@ -66,8 +86,15 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
 const styles = StyleSheet.create({
 	screen: {
+		position: 'relative',
 		padding: 10,
 		height: '100%'
+	},
+	trailerWrapper: {
+		marginBottom: 5,
+	},
+	similarWrapper: {
+		marginBottom: 25,
 	},
 	imageBackdrop: {
         borderRadius: 10,
@@ -105,15 +132,16 @@ const styles = StyleSheet.create({
 		marginRight: 5,
 		color: 'white'
 	},
+	trailerTitle: {
+        color: 'white',
+		paddingBottom: 5,
+        fontWeight: 'bold'
+	},
 	cardDescription: {
 		color: '#f7f7f7',
 		fontSize: 13,
 		marginTop: 5
 	},
-	bolText: {
-        color: 'white',
-        fontWeight: 'bold'
-    },
 	cardNumbers: {
 		flexDirection: 'row',
 		marginTop: 5
