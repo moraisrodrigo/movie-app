@@ -64,8 +64,7 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 		prepare();
 	}, []);
 
-	if (isLoading || !person) return <Text style={{ backgroundColor: '#FF0000' }}>asd</Text>
-	if (isLoading || !person) return <Spinner />
+	if (isLoading || !person) return <View style={styles.loadingScreen}><Spinner color="white" /></View>;
 
 	return (
 		<SafeAreaView>
@@ -77,39 +76,39 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 					/>
 					<View style={{ flexWrap: "wrap", flex: 1 }}>
 					<View style={styles.artistInfoContainer}>
-						<Text style={[ styles.artistName, { color:'white' }]}>
+						<Text style={[ styles.artistName, styles.whiteColor]}>
 						{person.name}
 						</Text>
 						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, { color:'white' }]}>
-							known for
+						<Text style={[ styles.titleContent, styles.whiteColor]}>
+							Known for
 						</Text>
-						<Text style={[ styles.titleData, { color:'white' }]}>
+						<Text style={[ styles.titleData, styles.whiteColor]}>
 							{person.known_for_department}
 						</Text>
 						</View>
 						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, { color:'white' }]}>
+						<Text style={[ styles.titleContent, styles.whiteColor]}>
 							Gender
 						</Text>
-						<Text style={[ styles.titleData, { color:'white' }]}>
+						<Text style={[ styles.titleData, styles.whiteColor]}>
 							{person.gender === 1 ? "Female" : "Male"}
 						</Text>
 						</View>
 						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, { color:'white' }]}>
+						<Text style={[ styles.titleContent, styles.whiteColor]}>
 							Birthday
 						</Text>
 						<Text
-							style={[ styles.titleData, { color:'white' }]}>
+							style={[ styles.titleData, styles.whiteColor]}>
 							{person.birthday}
 						</Text>
 						</View>
 						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, { color:'white' }]} >
+						<Text style={[ styles.titleContent, styles.whiteColor]} >
 							Place of Birth
 						</Text>
-						<Text style={[ styles.titleData, { color:'white' }]}>
+						<Text style={[ styles.titleData, styles.whiteColor]}>
 							{person.place_of_birth}
 						</Text>
 						</View>
@@ -118,14 +117,18 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 				</View>
 				{renderMovies()}
 				<View style={styles.biographyWrapper}>
-					<Text
-						style={[styles.biography, { color:'white' }]}
-					>
-						Biography
-					</Text>
-					<Text style={{ color:'white' }}>
-						{person.biography}
-					</Text>
+					{person.biography && (
+						<>
+							<Text
+								style={[styles.biography, styles.whiteColor]}
+							>
+								Biography
+							</Text>
+							<Text style={styles.whiteColor}>
+								{person.biography}
+							</Text>
+						</>
+					)}
 				</View>
 			</ScrollView>
 		</SafeAreaView>
@@ -133,6 +136,14 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
+	loadingScreen: {
+		height: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	whiteColor: {
+		color:'white'
+	},
 	screen: {
 		padding: 10,
 		marginBottom: 20,

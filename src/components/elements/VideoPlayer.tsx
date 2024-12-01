@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef } from "react";
+import { FunctionComponent, ReactElement } from "react";
 import {  StyleSheet } from "react-native";
 import { MovieVideo } from "../../types/responses";
 import { WebView } from "react-native-webview";
@@ -9,21 +9,23 @@ interface Props {
 }
 
 export const VideoPlayer: FunctionComponent<Props> = (props: Props) => {
-    const { video } = props;
+    const { video: { key } } = props;
 
-    const webViewRef = useRef(null);
+    const onLoad = (): ReactElement => <Spinner style={styles.container} />
 
     return (
         <WebView
-            ref={webViewRef}
-            source={{ uri: `https://www.youtube.com/embed/${video.key}?autoplay=0&hl=pt&modestbranding=1&fs=1&autohide=1` }}
+            source={{ uri: `https://www.youtube.com/embed/${key}?autoplay=0&hl=pt&modestbranding=1&fs=1&autohide=1` }}
             startInLoadingState
+            allowsPictureInPictureMediaPlayback
+            allowsLinkPreview
             allowsAirPlayForMediaPlayback
             allowsFullscreenVideo
             allowsInlineMediaPlayback
             javaScriptCanOpenWindowsAutomatically
             javaScriptEnabled
-            renderLoading={() => <Spinner style={styles.container} />}
+            onLoad={onLoad}
+            renderLoading={onLoad}
             style={{ height: 275 }}
         />
     )

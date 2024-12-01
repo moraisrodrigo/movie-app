@@ -39,6 +39,7 @@ const getTitle = (route: string): ReactNode => {
         case AppRoute.Search:
             title = 'Search'
         break;
+        case AppRoute.SearchWrapper:
         case AppRoute.Profile:
             title = 'Profile'
         break;
@@ -61,12 +62,15 @@ const getTabBarIcon = ({ focused, color, size }: TabBarIconProps, routeName: str
             return <AntDesign name="user" { ...commonProps } />;
         case AppRoute.Movie:
             return <MaterialCommunityIcons name="movie-play" { ...commonProps } />;
-            case AppRoute.MovieWrapper:
-                case AppRoute.MoviesList:
+        case AppRoute.MovieWrapper:
+        case AppRoute.MoviesList:
             return <MaterialCommunityIcons name="movie" { ...commonProps } />;
+        case AppRoute.SearchWrapper:
         case AppRoute.Search:
             return <AntDesign name="search1" { ...commonProps } />;
     }
+
+    return <AntDesign name="user" { ...commonProps } />;
 }
 
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
@@ -91,11 +95,21 @@ const App: FunctionComponent = () => {
         return (
            <StackNavigator screenOptions={{ headerShown: false }} initialRouteName={AppRoute.MoviesList}>
               <StackScreen name={AppRoute.MoviesList} component={MoviesListScreen} />
-              <StackScreen name={AppRoute.Movie} component={MovieScreen} />
-              <StackScreen name={AppRoute.Person} component={PersonScreen} />
+                <StackScreen name={AppRoute.Movie} component={MovieScreen} />
+                <StackScreen name={AppRoute.Person} component={PersonScreen} />
            </StackNavigator>
         );
-     }
+    }
+
+    const SearchWrapper = (): ReactNode => {
+        return (
+           <StackNavigator screenOptions={{ headerShown: false }} initialRouteName={AppRoute.Search}>
+                <Screen name={AppRoute.Search} component={SearchScreen} />
+                <StackScreen name={AppRoute.Movie} component={MovieScreen} />
+                <StackScreen name={AppRoute.Person} component={PersonScreen} />
+           </StackNavigator>
+        );
+    }
 
     return (
         <PersistGate persistor={persistor}>
@@ -112,7 +126,7 @@ const App: FunctionComponent = () => {
                         })}
                     >
                         <Screen name={AppRoute.MovieWrapper} component={MoviesWrapper} />
-                        <Screen name={AppRoute.Search} component={SearchScreen} />
+                        <Screen name={AppRoute.SearchWrapper} component={SearchWrapper} />
                         <Screen name={AppRoute.Profile} component={ProfileScreen} />
                     </Navigator>
                 </NavigationContainer>

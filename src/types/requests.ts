@@ -7,9 +7,14 @@ type MoviesListRequest = {
     sort_by?: string;
 }
 
-type MovieListSearchRequest = {
+type MovieListFilterRequest = {
     page: number;
     with_genres: string, //can be a comma (,AND) or pipe (|OR) separated query
 }
 
-export type { MoviesListRequest, MovieListSearchRequest };
+type MovieListSearchRequest = {
+    page: number;
+    query: string;
+}
+
+export type { MoviesListRequest, MovieListSearchRequest, MovieListFilterRequest };

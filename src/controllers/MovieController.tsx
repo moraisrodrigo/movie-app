@@ -1,7 +1,7 @@
 import { Component, ComponentType, createContext, FunctionComponent, ReactNode } from "react";
 import axios from "axios";
-import { discoverURL, genresURL, movieCredits, movieDetails, movieSimilar, moviesUrl, movieVideos } from "../services/movies";
-import { MovieListSearchRequest, MoviesListRequest } from "../types/requests";
+import { discoverURL, genresURL, movieCredits, movieDetails, movieSimilar, moviesUrl, movieVideos, searchMovieURL } from "../services/movies";
+import { MovieListFilterRequest, MovieListSearchRequest, MoviesListRequest } from "../types/requests";
 import { connect } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { Genre, Movie, SectionKey } from "../types/movie";
@@ -32,9 +32,21 @@ class MovieController extends Component<Props> {
         }
     }
 
-    getMoviesSearch = async (request: MovieListSearchRequest): Promise<MoviesListResponse | null> => {
+    getMoviesFilter = async (request: MovieListFilterRequest): Promise<MoviesListResponse | null> => {
         try {
             const { data } = await axios.get<MoviesListResponse>(discoverURL(request));
+
+            return data;
+        } catch (e) {
+            console.log("error = ", e);
+            
+            return null;
+        }
+    }
+
+    getMoviesSearch = async (request: MovieListSearchRequest): Promise<MoviesListResponse | null> => {
+        try {
+            const { data } = await axios.get<MoviesListResponse>(searchMovieURL(request));
 
             return data;
         } catch (e) {
@@ -98,6 +110,7 @@ class MovieController extends Component<Props> {
                     selectedMovie,
                     firstMovie,
                     getMoviesList: this.getMoviesList,
+                    getMoviesFilter: this.getMoviesFilter,
                     getMoviesSearch: this.getMoviesSearch,
                     getGenres: this.getGenres,
                     getMovieDetails: this.getMovieDetails,

@@ -1,6 +1,5 @@
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { FunctionComponent, ReactNode, useCallback, useEffect, useState } from "react";
 import {
-    Button,
     FlatList,
     Image,
     ListRenderItemInfo,
@@ -16,6 +15,8 @@ import { MovieContext, withMovieContext } from "../../controllers/MovieControlle
 import { Genre, Movie } from "../../types/movie";
 import { MoviesListResponse } from "../../types/responses";
 import { TMDB_IMG_URL } from "../../settings";
+import { SearchBar } from "../elements/SearchBar";
+import { Entypo } from "@expo/vector-icons";
 
 type Props = SearchRouteParams & MovieContext;
 
@@ -27,11 +28,12 @@ const initialList: MoviesListResponse = {
 }
 
 const SearchScreenComponent: FunctionComponent<Props> = (props: Props) => {
-    const { navigation: { navigate }, getGenres, getMoviesSearch } = props;
+    const { navigation: { navigate }, getGenres, getMoviesSearch, getMoviesFilter } = props;
 
     const [moviesList, setMoviesList] = useState<MoviesListResponse>(initialList);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [genres, setGenres] = useState<Genre[]>([]);
+    const [textValue, setTextValue] = useState<string>('');
     const [genreSelected, setGenreSelected] = useState<Genre | null>(null);
 
     useEffect(() => {
@@ -40,48 +42,74 @@ const SearchScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
     useEffect(() => {
         if (genreSelected !== null) {
-            fetchMore();
+            fetchMore(true);
         } else {
             clearMovies();
         }
-    }, [genreSelected])
+    }, [genreSelected]);
 
+    useEffect(() => {
+        if (textValue) {
+            fetchMore(true);
+        } else {
+            clearMovies();
+        }
+    }, [textValue]);
 
     const onGenreClick = (genre: Genre) => setGenreSelected(genre);
 
-    const onMovieClick = (movie: Movie): void => navigate(AppRoute.MovieWrapper, { screen: AppRoute.Movie, params: { movie } });
+    const onMovieClick = (movie: Movie): void => navigate(AppRoute.SearchWrapper, { screen: AppRoute.Movie, params: { movie } });
 
-    const prepare = async () => {
+    const prepare = async (): Promise<void> => {
         const genresList = await getGenres();
 
         setGenres(genresList);
     };
 
-    const clearMovies = () => {
+    const clearMovies = (): void => {
         setMoviesList(initialList);
-    }
+    };
 
-    const fetchMore = async () => {
-        if (isLoading || !genreSelected) return;
+    const fetchMore = async (clearList: boolean = false): Promise<void> => {
+        if (isLoading) return;
 
         setIsLoading(true);
 
         const { page, results } = moviesList;
 
-        const data: MoviesListResponse | null = await getMoviesSearch({ page: page + 1, with_genres: String(genreSelected.id) });
+        const customPage: number = clearList ? 1 : page + 1;
+
+        let data: MoviesListResponse | null = null;
+
+        if (textValue) {
+            data = await getMoviesSearch({ page: customPage, query: textValue });
+        } else if (genreSelected) {
+            data = await getMoviesFilter({ page: customPage, with_genres: String(genreSelected.id) });
+        }
 
         setIsLoading(false);
 
-        if (!data) return;
+        if (!data) {
+            clearMovies();
+            return;
+        }
 
-        const existingIds: Set<number> = new Set<number>(results.map(({ id }) => id));
+        let newResults: Movie[] = [];
 
-        const uniqueMovies: Movie[] = data.results.filter(({ id }) => !existingIds.has(id));
+        if (!clearList) {
+            const existingIds: Set<number> = new Set<number>(results.map(({ id }) => id));
+
+            newResults = data.results.filter(({ id }) => !existingIds.has(id));
+
+            newResults.unshift(...results)
+        } else {
+            newResults = newResults.concat(data.results);
+        }
 
         setMoviesList((prevState) => ({
             ...prevState,
             ...data,
-            results: [...prevState.results, ...uniqueMovies],
+            results: newResults,
         }));
     };
 
@@ -123,42 +151,54 @@ const SearchScreenComponent: FunctionComponent<Props> = (props: Props) => {
         </TouchableOpacity>
     ), []);
 
-    const renderGenres = () => {
+    const renderGenres = (): ReactNode => {
         if (genres.length === 0) return <></>;
 
-        return genres.map((genre: Genre) => (
-            <TouchableOpacity
-                onPress={() => onGenreClick(genre)}
-                key={genre.id}
-                style={styles.genreWrapper}
-            >
-                <Text style={styles.text} >
-                    {genre.name}
-                </Text>
-            </TouchableOpacity>
-        ))
-    }
+        return (
+            <ScrollView>
+                {genres.map((genre: Genre) => (
+                    <TouchableOpacity
+                        onPress={() => onGenreClick(genre)}
+                        key={genre.id}
+                        style={styles.genreWrapper}
+                    >
+                        <Text style={styles.text} >
+                            {genre.name}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+        );
+    };
 
-    const renderMovies = () => {
+    const renderMovies = (): ReactNode => {
         return (
             <>
-                <View>
-                    <Text>
-                        clear genre
-                    </Text>
-                    {genreSelected && (
-                        <Button
-                            title={`${genreSelected.name} X`}
+                {genreSelected && (
+                    <View style={styles.genreActiveWrapper}>
+                        <TouchableOpacity
                             onPress={() => setGenreSelected(null)}
-                        />
-                    )}
-                </View>
+                            key={genreSelected.id}
+                            style={styles.genreActive}
+                        >
+                            <Text style={styles.text} >
+                                {genreSelected.name}
+                                <Entypo
+                                    name="cross"
+                                    size={20}
+                                    color="white"
+                                    style={styles.cross}
+                                />
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
                 {renderMoviesList()}
             </>
         )
-    }
+    };
 
-    const renderMoviesList = () => {
+    const renderMoviesList = (): ReactNode => {
         return (
             <FlatList
                 scrollEnabled={true}
@@ -167,20 +207,20 @@ const SearchScreenComponent: FunctionComponent<Props> = (props: Props) => {
                 numColumns={2}
                 renderItem={renderCard}
                 onEndReachedThreshold={0.3}
-                onEndReached={fetchMore}
+                onEndReached={() => fetchMore()}
                 keyExtractor={(movie) => String(`${movie.id}`)}
             />
         )
-    }
+    };
 
     return (
         <SafeAreaView>
-            {moviesList.results.length > 0 ?
-                renderMovies() :
-                <ScrollView style={styles.screen}>
-                    {renderGenres()}
-                </ScrollView>
-            }
+            <View style={styles.screen}>
+                <View style={styles.searchBar}>
+                    <SearchBar onChange={setTextValue} />
+                </View>
+                {moviesList.results.length > 0 ? renderMovies() : renderGenres()}
+            </View>
         </SafeAreaView>
     );
 }
@@ -189,6 +229,9 @@ const styles = StyleSheet.create({
 	screen: {
 		padding: 10,
 		height: '100%'
+	},
+	searchBar: {
+        marginBottom: 10,
 	},
     text: {
         color: 'white',
@@ -204,6 +247,23 @@ const styles = StyleSheet.create({
         marginBlock: 5,
         filter: 'blur',
     },
+    genreActiveWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    genreActive: {
+        backgroundColor: 'rgba(52, 52, 52, 0.8)',
+        borderRadius: 10,
+        paddingBlock: 10,
+        paddingInline: 20,
+        marginBlock: 5,
+        alignItems: 'center',
+    },
+    cross: {
+        padding: 1,
+        right: 10,
+    },
 	list: {
         marginVertical: 15,
 	},
@@ -212,7 +272,6 @@ const styles = StyleSheet.create({
         display: "flex",
         marginVertical: 20,
     },
-    //---
     mainView: {
         flex: 1,
         flexDirection: "column",

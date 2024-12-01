@@ -39,15 +39,23 @@ const CastComponent: FunctionComponent<Props> = (props: Props) => {
     );
 
     return (
-        <View style={styles.view}>
-            <Text style={styles.topCastTitle}>Top Cast</Text>
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 15 }}>
-                {cast && cast.map(renderCast)}
-            </ScrollView>
-        </View>
+        cast.length > 0 && (
+            <View style={styles.view}>
+                <View style={styles.titleWrapper}>
+                    <View style={styles.line} />
+                    <View>
+                        <Text style={styles.title}>Top Cast</Text>
+                    </View>
+                    <View style={styles.line} />
+                </View>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 15 }}>
+                    {cast.map(renderCast)}
+                </ScrollView>
+            </View>
+        )
     );
 }
 
@@ -64,9 +72,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 10,
     },
-    topCastTitle: {
-        color: 'white',
-        fontWeight: 'bold'
+    titleWrapper: {
+        marginBottom: 10,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    line: {
+        flex: 1,
+        height: 1,
+        marginInline: 10,
+        backgroundColor: '#FF214A'
+    },
+    title: {
+        fontWeight: 'bold',
+        color: '#FFFFFF'
     },
     name: {
         color: 'white'
