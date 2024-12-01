@@ -1,4 +1,4 @@
-import { deleteItemAsync, getItem, setItemAsync } from 'expo-secure-store';
+import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
 import { SessionIdKey } from './constants/api';
 
 const setSessionId = async (sessionId: string | null): Promise<void> => {
@@ -9,6 +9,6 @@ const setSessionId = async (sessionId: string | null): Promise<void> => {
     }
 };
 
-const getSessionId = (): string | null => getItem(SessionIdKey);
+const getSessionId = async (): Promise<string | null> => await getItemAsync(SessionIdKey);
 
 export { setSessionId, getSessionId };

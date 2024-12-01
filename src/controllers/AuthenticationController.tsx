@@ -8,6 +8,7 @@ import { accountUrl, authenticateUrl, createRequestTokenUrl, createSessionUrl, d
 import axios from "axios";
 import { RequestTokenCreate, SessionCreate } from "../types/authentication";
 import { getSessionId, setSessionId } from "../secureStore";
+import { setup } from "../api";
 
 
 interface OwnProps {
@@ -27,6 +28,8 @@ class AuthenticationController extends Component<Props> {
             await openBrowserAsync(authenticateUrl(request_token));
 
             const { data: { session_id } } = await axios.post<SessionCreate>(createSessionUrl(), { request_token });
+
+            setup(session_id);
 
             await setSessionId(session_id);
 

@@ -32,7 +32,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         const { username, name, iso_639_1, iso_3166_1, include_adult } = authenticatedUser;
 
         return (
-            <>
+            <ScrollView contentContainerStyle={styles.screen}>
                 {renderAvatar()}
                 <Text style={styles.profileName}>{name || username}</Text>
                 <View style={styles.userDetailsWrapper}>
@@ -42,7 +42,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                     <Text style={styles.userDetails}>Include Adult: {include_adult ? "Yes" : "No"}</Text>
                 </View>
                 <Button title="Logout" onPress={logout} />
-            </>
+            </ScrollView>
         );
     }
 
@@ -57,9 +57,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.screen}>
-                {authenticatedUser ? renderAuthUser() : renderNonAuthUser()}
-            </ScrollView>
+            {authenticatedUser ? renderAuthUser() : renderNonAuthUser()}
         </SafeAreaView>
     );
 }
@@ -72,6 +70,7 @@ const styles = StyleSheet.create({
     screen: {
         padding: 20,
         alignItems: 'center',
+        height: '100%',
     },
     avatarImage: {
         width: 80,
@@ -97,6 +96,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     nonAuthWrapper: {
+        height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
         alignContent: 'center'

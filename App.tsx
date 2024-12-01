@@ -77,18 +77,27 @@ const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavigator<RootStackParamList>()
 
 const App: FunctionComponent = () => {
-    const [isPrepared, setIsPrepared] = useState(false);
 
-    const sessionId = getSessionId();
+    const [isPrepared, setIsPrepared] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchSessionId = async () => {
+            const id = await getSessionId();
+            setSessionId(id);
+        };
+
+        fetchSessionId();
+    }, []);
+
+    useEffect(() => {
+        prepare();
+    }, [sessionId]);
 
     const prepare = () => {
         setup(sessionId);
         setIsPrepared(true);
     }
-
-    useEffect(() => {
-        prepare();
-    }, [sessionId]);
 
     if (!isPrepared) return <></>;
 
