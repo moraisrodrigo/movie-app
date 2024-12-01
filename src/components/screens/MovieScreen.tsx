@@ -61,7 +61,13 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
 		return (
 			<View style={styles.trailerWrapper}>
-				<Text style={styles.trailerTitle}>Trailer</Text>
+				<View style={styles.trailerTitleWrapper}>
+					<View style={styles.line} />
+					<View>
+						<Text style={styles.trailerTitle}>Trailer</Text>
+					</View>
+					<View style={styles.line} />
+				</View>
 				<VideoPlayer video={videos[0]} />
 			</View>
 		)
@@ -169,7 +175,18 @@ const styles = StyleSheet.create({
 	},
 	viewButtonText: {
 		color: 'white'
-	}
+	},
+    trailerTitleWrapper: {
+        marginBottom: 10,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+	line: {
+        flex: 1,
+        height: 1,
+        marginInline: 10,
+        backgroundColor: '#FF214A'
+    },
 });
 
 export const MovieScreen =  withMovieContext(MovieScreenComponent);

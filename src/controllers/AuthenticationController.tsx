@@ -28,7 +28,7 @@ class AuthenticationController extends Component<Props> {
 
             const { data: { session_id } } = await axios.post<SessionCreate>(createSessionUrl(), { request_token });
 
-            setSessionId(session_id);
+            await setSessionId(session_id);
 
             const { data } = await axios.get<User>(accountUrl());
 

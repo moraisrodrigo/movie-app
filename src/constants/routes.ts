@@ -39,7 +39,6 @@ type RootStackParamList  = {
 interface SearchRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.Search> { }
 interface ProfileRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.Profile> { }
 interface PersonRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.Person> { }
-interface IndexRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.Index> { }
 interface MovieRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.Movie> { }
 interface MoviesListRouteParams extends NativeStackScreenProps<RootStackParamList, AppRoute.MoviesList> { }
 
@@ -50,7 +49,6 @@ export type {
     SearchRouteParams,
     ProfileRouteParams,
     PersonRouteParams,
-    IndexRouteParams,
     MovieRouteParams,
     MoviesListRouteParams,
 };

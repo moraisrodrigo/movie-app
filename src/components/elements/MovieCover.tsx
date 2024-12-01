@@ -30,7 +30,7 @@ const MovieCover: FunctionComponent<Props> = (props: Props) => {
 					<View style={styles.cardNumbers}>
 						<View style={styles.cardStar}>
 							<AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
-							<Text style={styles.cardStarRatings}>{vote_average}</Text>
+							<Text style={styles.cardStarRatings}>{vote_average.toFixed(1)}/10</Text>
 						</View>
 						<Text style={styles.cardRunningHours} />
 					</View>

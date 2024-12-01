@@ -143,7 +143,7 @@ const SearchScreenComponent: FunctionComponent<Props> = (props: Props) => {
                         })}
                     </Text>
                     <Text style={[ styles.infoTitleData, { color: 'white' }]}>
-                        ⭐️{item.vote_average.toFixed(2) + "/10"}
+                        ⭐️{item.vote_average.toFixed(1)}/10
                     </Text>
                     </View>
                 </View>

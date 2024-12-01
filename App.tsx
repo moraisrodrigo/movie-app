@@ -79,15 +79,16 @@ const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavi
 const App: FunctionComponent = () => {
     const [isPrepared, setIsPrepared] = useState(false);
 
+    const sessionId = getSessionId();
+
     const prepare = () => {
-        const sessionId = getSessionId();
         setup(sessionId);
         setIsPrepared(true);
     }
 
     useEffect(() => {
         prepare();
-    }, []);
+    }, [sessionId]);
 
     if (!isPrepared) return <></>;
 
