@@ -9,6 +9,9 @@ import axios from "axios";
 import { RequestTokenCreate, SessionCreate } from "../types/authentication";
 import { getSessionId, setSessionId } from "../secureStore";
 import { setup } from "../api";
+import { MoviesListResponse } from "../types/responses";
+import { favouriteMoviesUrl } from "../services/movies";
+import { ListParams } from "../types/requests";
 
 
 interface OwnProps {
@@ -60,6 +63,20 @@ class AuthenticationController extends Component<Props> {
         }
     }
 
+    getFavouriteMovies = async (request: ListParams): Promise<MoviesListResponse | null> => {
+        const { authenticatedUser } = this.props;
+
+        if (!authenticatedUser) return null;
+
+        try {
+            const { data } = await axios.get<MoviesListResponse>(favouriteMoviesUrl(String(authenticatedUser.id), request));
+
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
     render(): ReactNode {
         const { children, authenticatedUser } = this.props;
 
@@ -69,6 +86,7 @@ class AuthenticationController extends Component<Props> {
                     authenticatedUser,
                     login: this.login,
                     logout: this.logout,
+                    getFavouriteMovies: this.getFavouriteMovies,
                 }}
             >
                 {children}

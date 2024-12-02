@@ -1,11 +1,13 @@
 import { Genre, Movie } from "./movie";
 
-type MoviesListResponse = {
+interface ListResponse<T> {
     page: number;
-    results: Movie[];
+    results: T[];
     total_pages: number;
     total_results: number;
 }
+
+type MoviesListResponse = ListResponse<Movie>
 
 type GenresListResponse = {
     genres: Genre[]

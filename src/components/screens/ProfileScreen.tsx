@@ -1,18 +1,87 @@
-import { FunctionComponent, ReactNode } from "react";
-import { AntDesign  } from '@expo/vector-icons';
-import { Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ProfileRouteParams } from "../../constants/routes";
+import { FunctionComponent, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { AntDesign, MaterialIcons  } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Button, Image, ListRenderItemInfo, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { AppRoute, ProfileRouteParams } from "../../constants/routes";
 import { AuthenticationContext, withAuthenticationContext } from "../../controllers/AuthenticationController";
 import { image500 } from "../../services/movies";
+import { ListItem } from "../elements/ListItem";
+import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { Movie } from "../../types/movie";
+import { MoviesListResponse } from "../../types/responses";
+import { Card } from "../elements/Card";
 
 type Props = ProfileRouteParams & AuthenticationContext;
 
+enum ListType {
+    Favourite = 'Favourite',
+    Watchlist = 'Watchlist',
+}
+
+const initialList: MoviesListResponse = {
+    page: 0,
+    results: [],
+    total_pages: 0,
+    total_results: 0
+}
+
 const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
-    const {  
-        authenticatedUser, 
+    const {
+        authenticatedUser,
         login,
-        logout
+        logout,
+        getFavouriteMovies,
+        navigation: { navigate }
     } = props;
+
+    const bottomSheetRef = useRef<BottomSheet>(null);
+
+    const [listShown, setListShown] = useState<ListType | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [moviesList, setMoviesList] = useState<MoviesListResponse>(initialList);
+
+    useEffect(() => {
+        onListChange();
+    }, [listShown])
+
+    const onMovieClick = (movie: Movie): void => navigate(AppRoute.MovieWrapper, { screen: AppRoute.Movie, params: { movie } });
+
+    const onListChange = async () => {
+        if (!bottomSheetRef.current) return;
+
+        if (listShown) {
+            fetchMovies();
+            bottomSheetRef.current.snapToIndex(0);
+        } else {
+            bottomSheetRef.current.close();
+        }
+    }
+
+    const fetchMovies = async (onReachEnd?: boolean) => {        
+        if (isLoading) return;
+
+        setIsLoading(true);
+
+        const { page, results } = moviesList;
+
+        const customPage: number = onReachEnd ? page + 1 : 1;
+
+        const data: MoviesListResponse | null = await getFavouriteMovies({ page: customPage });
+
+        setIsLoading(false);
+    
+        if (!data) return;
+
+        const existingIds: Set<number> = new Set<number>(results.map(({ id }) => id));
+
+        const uniqueMovies: Movie[] = data.results.filter(({ id }) => !existingIds.has(id));
+    
+        setMoviesList((prevState) => ({
+            ...prevState,
+            ...data,
+            results: [...prevState.results, ...uniqueMovies],
+        }));
+    };
 
     const renderAvatar = (): ReactNode => {
         if (!authenticatedUser) return null;
@@ -26,23 +95,96 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         return <AntDesign name="user" size={80} color="white" style={styles.avatarFallback} />;
     };
 
+    const renderListItems = (): ReactNode => (
+        <>
+            <ListItem
+                label="Favourite Movies"
+                onClick={() => setListShown(ListType.Favourite)}
+                startIcon={(
+                    <View style={[styles.circle, styles.backgroudRed]}>
+                        <MaterialIcons
+                            name="favorite"
+                            size={26}
+                            color="white"
+                        />
+                    </View>
+                )}
+                endIcon={(
+                    <MaterialIcons
+                        name="arrow-forward-ios"
+                        size={26}
+                        color="white"
+                    />
+                )}
+            />
+            <ListItem
+                label="Watchlist Movies"
+                onClick={() => setListShown(ListType.Watchlist)}
+                startIcon={(
+                    <View style={[styles.circle, styles.backgroudYellow]}>
+                        <MaterialIcons
+                            name="bookmark"
+                            size={26}
+                            color="white"
+                        />
+                    </View>
+                )}
+                endIcon={(
+                    <MaterialIcons
+                        name="arrow-forward-ios"
+                        size={26}
+                        color="white"
+                    />
+                )}
+            />
+        </>
+    );
+
+    const renderCard = useCallback(({ item, index }: ListRenderItemInfo<Movie>) => (
+        <Card movie={item} key={`${index}-${item.id}`} onClick={onMovieClick} />
+    ), []);
+
+    const renderBottomSheet = (): ReactNode => {
+        return (
+            <BottomSheet
+                ref={bottomSheetRef}
+                index={-1}
+                style={styles.bottomSheet}
+                snapPoints={["90%"]}
+                animateOnMount={false}
+                onClose={() => setListShown(null)}
+                enablePanDownToClose
+                enableDynamicSizing={false}
+                handleIndicatorStyle={{ backgroundColor: "white" }}
+                backgroundStyle={{ backgroundColor: '#111111' }}
+            >
+                <BottomSheetFlatList
+                    horizontal={false}
+                    contentContainerStyle={styles.contentContainer}
+                    scrollEnabled={true}
+                    data={moviesList.results}
+                    renderItem={renderCard}
+                    onEndReachedThreshold={0.3}
+                    onEndReached={() => fetchMovies(true)}
+                    keyExtractor={(movie) => String(`${movie.id}`)}
+                />
+            </BottomSheet>
+        )
+    };
+
     const renderAuthUser = (): ReactNode => {
         if (!authenticatedUser) return null;
 
-        const { username, name, iso_639_1, iso_3166_1, include_adult } = authenticatedUser;
+        const { username, name } = authenticatedUser;
 
         return (
-            <ScrollView contentContainerStyle={styles.screen}>
+            <View style={styles.screen}>
                 {renderAvatar()}
                 <Text style={styles.profileName}>{name || username}</Text>
-                <View style={styles.userDetailsWrapper}>
-                    <Text style={styles.userDetails}>Username: {username}</Text>
-                    <Text style={styles.userDetails}>Language: {iso_639_1}</Text>
-                    <Text style={styles.userDetails}>Region: {iso_3166_1}</Text>
-                    <Text style={styles.userDetails}>Include Adult: {include_adult ? "Yes" : "No"}</Text>
-                </View>
+                {renderListItems()}
                 <Button title="Logout" onPress={logout} />
-            </ScrollView>
+                {renderBottomSheet()}
+            </View>
         );
     }
 
@@ -57,15 +199,27 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {authenticatedUser ? renderAuthUser() : renderNonAuthUser()}
+            <GestureHandlerRootView style={styles.container}>
+                {authenticatedUser ? renderAuthUser() : renderNonAuthUser()}
+            </GestureHandlerRootView>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    contentContainer: {
+        padding: 10,
+    },
 	container: {
         flex: 1,
         height: '100%'
+    },
+    bottomSheet: {
+        zIndex: 1,
+    },
+    bottomSheetContent: {
+        flex: 1,
+        alignItems: 'center',
     },
     screen: {
         padding: 20,
@@ -73,8 +227,8 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     avatarImage: {
-        width: 80,
-        height: 80,
+        width: 140,
+        height: 140,
         borderRadius: 40,
         marginBottom: 10,
     },
@@ -87,13 +241,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: '#FFFFFF',
     },
-    userDetailsWrapper: {
-        marginBottom: 20,
+    list: {
         width: '100%',
-        alignItems: "flex-start"
     },
-    userDetails: {
-        color: '#FFFFFF',
+    circle: {
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 34,
+        height: 34,
+    },
+    backgroudRed: {
+        backgroundColor: '#FF214A'
+    },
+    backgroudYellow: {
+        backgroundColor: '#ffd866'
     },
     nonAuthWrapper: {
         height: '100%',
