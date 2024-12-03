@@ -10,7 +10,7 @@ import { RequestTokenCreate, SessionCreate } from "../types/authentication";
 import { getSessionId, setSessionId } from "../secureStore";
 import { setup } from "../api";
 import { MoviesListResponse } from "../types/responses";
-import { favouriteMoviesUrl } from "../services/movies";
+import { favouriteMoviesUrl, watchlistMoviesUrl } from "../services/movies";
 import { ListParams } from "../types/requests";
 
 
@@ -77,6 +77,20 @@ class AuthenticationController extends Component<Props> {
         }
     }
 
+    getWatchListMovies = async (request: ListParams): Promise<MoviesListResponse | null> => {
+        const { authenticatedUser } = this.props;
+
+        if (!authenticatedUser) return null;
+
+        try {
+            const { data } = await axios.get<MoviesListResponse>(watchlistMoviesUrl(String(authenticatedUser.id), request));
+
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
     render(): ReactNode {
         const { children, authenticatedUser } = this.props;
 
@@ -87,6 +101,7 @@ class AuthenticationController extends Component<Props> {
                     login: this.login,
                     logout: this.logout,
                     getFavouriteMovies: this.getFavouriteMovies,
+                    getWatchListMovies: this.getWatchListMovies,
                 }}
             >
                 {children}

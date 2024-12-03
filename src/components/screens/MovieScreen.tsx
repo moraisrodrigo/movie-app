@@ -81,7 +81,9 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 		<SafeAreaView>
 			<ScrollView style={styles.screen}>
 				<MovieCover movie={movie} />
-				<Text style={styles.cardDescription} numberOfLines={3}>{movie.overview}</Text>
+				<Text style={styles.cardDescription}>
+					{movie.overview}
+				</Text>
 				{renderCast()}
 				{renderTrailers()}
 				{renderSimilar()}

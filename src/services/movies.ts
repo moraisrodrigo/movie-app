@@ -21,6 +21,8 @@ const movieSimilar = (movieId: number, page: number) => `${TMDB_URL}/movie/${mov
 
 const favouriteMoviesUrl = (accountId: string, request: ListParams) => `${TMDB_URL}/account/${accountId}/favorite/movies${objectToParams(request)}`
 
+const watchlistMoviesUrl = (accountId: string, request: ListParams) => `${TMDB_URL}/account/${accountId}/watchlist/movies${objectToParams(request)}`
+
 const image500 = (path?: string): string | null => path ? `${TMDB_IMG_URL}/w500/${path}` : null;
 
 const image185 = (path: string | null): string | null => path ? `${TMDB_IMG_URL}/w185/${path}` : null;
@@ -37,6 +39,7 @@ export {
     discoverURL,
     searchMovieURL,
     favouriteMoviesUrl,
+    watchlistMoviesUrl,
     image500,
     image342,
     image185,

@@ -31,6 +31,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         login,
         logout,
         getFavouriteMovies,
+        getWatchListMovies,
         navigation: { navigate }
     } = props;
 
@@ -50,6 +51,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         if (!bottomSheetRef.current) return;
 
         if (listShown) {
+            setMoviesList(initialList);
             fetchMovies();
             bottomSheetRef.current.snapToIndex(0);
         } else {
@@ -58,7 +60,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
     }
 
     const fetchMovies = async (onReachEnd?: boolean) => {        
-        if (isLoading) return;
+        if (isLoading || !listShown) return;
 
         setIsLoading(true);
 
@@ -66,7 +68,9 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
         const customPage: number = onReachEnd ? page + 1 : 1;
 
-        const data: MoviesListResponse | null = await getFavouriteMovies({ page: customPage });
+        const getMovies = listShown === ListType.Favourite ? getFavouriteMovies : getWatchListMovies;
+
+        const data: MoviesListResponse | null = await getMovies({ page: customPage });
 
         setIsLoading(false);
     
@@ -140,8 +144,32 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         </>
     );
 
-    const renderCard = useCallback(({ item, index }: ListRenderItemInfo<Movie>) => (
-        <Card movie={item} key={`${index}-${item.id}`} onClick={onMovieClick} />
+    const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>) => (
+        <View style={styles.movieWrapper}>
+            <Card
+                movie={movie}
+                key={`${index}-${movie.id}`}
+                onClick={onMovieClick}
+            />
+            <View style={styles.cardDetails}>
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                    {movie.original_title}
+                </Text>
+                <View style={styles.cardGenre}>
+                    <Text style={styles.cardGenreItem}>Action</Text>
+                </View>
+                <View style={styles.cardNumbers}>
+                    <View style={styles.cardStar}>
+                        <AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
+                        <Text style={styles.cardStarRatings}>{movie.vote_average.toFixed(1)}/10</Text>
+                    </View>
+                    <Text style={styles.cardRunningHours} />
+                </View>
+				<Text numberOfLines={3} style={styles.cardDescription}>
+					{movie.overview}
+				</Text>
+            </View>
+        </View>
     ), []);
 
     const renderBottomSheet = (): ReactNode => {
@@ -214,6 +242,11 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%'
     },
+	movieWrapper: {
+        display: 'flex',
+        paddingBlock: 10,
+        flexDirection: 'row',
+    },
     bottomSheet: {
         zIndex: 1,
     },
@@ -269,6 +302,51 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         marginBottom: 10,
     },
+    cardDetails: {
+		paddingLeft: 10,
+		flex: 1,
+        gap: 8,
+	},
+	cardTitle: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: '600',
+		paddingTop: 10
+	},
+	cardGenre: {
+		flexDirection: 'row'
+	},
+	cardGenreItem: {
+		fontWeight: '600',
+		fontSize: 11,
+		marginRight: 5,
+		color: 'white'
+	},
+	cardNumbers: {
+		flexDirection: 'row',
+		marginTop: 5
+	},
+	cardStar: {
+		flexDirection: 'row'
+	},
+	cardStarRatings: {
+		marginLeft: 5,
+		fontWeight: '600',
+		fontSize: 12,
+		color: 'white'
+	},
+	star: {
+		fontSize: 12,
+	},
+	cardRunningHours: {
+		marginLeft: 5,
+		fontSize: 12
+	},
+    cardDescription: {
+		color: '#f7f7f7',
+		fontSize: 13,
+		marginTop: 5
+	},
 });
 
 export const ProfileScreen = withAuthenticationContext(ProfileScreenComponent);
