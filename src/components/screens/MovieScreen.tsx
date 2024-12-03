@@ -14,11 +14,7 @@ interface Props extends MovieRouteParams, MovieContext { }
 
 const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
-		route: {
-			params: {
-				movie,
-			}
-		},
+		route: { params: { movie } },
 		navigation,
 		getMovieCredits,
 		getSimilarMovies,
@@ -71,11 +67,9 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 				<VideoPlayer video={videos[0]} />
 			</View>
 		)
-	}
+	};
 
-	const renderCast = () => {
-		return <CastComponent cast={cast} navigation={navigation} />;
-	}
+	const renderCast = (): ReactNode => <CastComponent cast={cast} navigation={navigation} />;
 
     return (
 		<SafeAreaView>

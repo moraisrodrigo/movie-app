@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.movie-app"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +34,11 @@
           "supportsPictureInPicture": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8d0c882b-a044-4c51-8b89-58c0429aae7b"
+      }
+    }
   }
 }

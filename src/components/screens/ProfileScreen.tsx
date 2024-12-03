@@ -87,6 +87,11 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         }));
     };
 
+    const onBottomSheetClose = (): void => {
+        setMoviesList(initialList);
+        setListShown(null);
+    }
+
     const renderAvatar = (): ReactNode => {
         if (!authenticatedUser) return null;
 
@@ -180,7 +185,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                 style={styles.bottomSheet}
                 snapPoints={["90%"]}
                 animateOnMount={false}
-                onClose={() => setListShown(null)}
+                onClose={onBottomSheetClose}
                 enablePanDownToClose
                 enableDynamicSizing={false}
                 handleIndicatorStyle={{ backgroundColor: "white" }}
