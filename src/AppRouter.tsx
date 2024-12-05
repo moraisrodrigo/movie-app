@@ -22,22 +22,6 @@ type TabBarIconProps = {
 
 type OwnProps = ThemeContext;
 
-const toastStyle: StyleProp<TextStyle> = {
-    color: 'white',
-    backgroundColor: '#111111',
-}
-
-const toastProps: BaseToastProps = {
-    contentContainerStyle: toastStyle,
-    text1Style: toastStyle,
-    text2Style: toastStyle,
-}
-
-const toastConfig: ToastConfig = {
-    success: (props) => <BaseToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#3ac9b0' }} />,
-    error: (props) => <ErrorToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#c01c28' }} />,
-};
-
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 const { Navigator: StackNavigator, Screen: StackScreen } = createNativeStackNavigator<RootStackParamList>()
 
@@ -75,6 +59,9 @@ const AppRouterComponent: FunctionComponent<OwnProps> = (props: OwnProps) => {
             break;
             case AppRoute.Profile:
                 title = 'Profile'
+            break;
+            case AppRoute.Person:
+                title = 'Profile';
             break;
             case AppRoute.Movie:
                 title = 'Details'
@@ -127,9 +114,25 @@ const AppRouterComponent: FunctionComponent<OwnProps> = (props: OwnProps) => {
         );
     }
 
+    const toastStyle: StyleProp<TextStyle> = {
+        color: theme === AppTheme.Dark ? 'white' : '#111111',
+        backgroundColor:  theme === AppTheme.Dark ? '#111111' : 'white',
+    }
+
+    const toastProps: BaseToastProps = {
+        contentContainerStyle: toastStyle,
+        text1Style: toastStyle,
+        text2Style: toastStyle,
+    }
+
+    const toastConfig: ToastConfig = {
+        success: (props) => <BaseToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#3ac9b0' }} />,
+        error: (props) => <ErrorToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#c01c28' }} />,
+    };
+
     return (
         <>
-            <StatusBar barStyle="light-content" />
+            <StatusBar barStyle={theme === AppTheme.Light ? 'dark-content' : 'light-content' } />
             <NavigationContainer theme={navigatorTheme}>
                 <Navigator
                     initialRouteName={AppRoute.MovieWrapper}

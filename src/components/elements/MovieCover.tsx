@@ -1,17 +1,41 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image, Text, View } from 'react-native';
-import { AntDesign  } from '@expo/vector-icons';
 import { TMDB_IMG_URL } from '../../settings';
-import { Movie } from '../../types/movie';
+import { Genre, Movie } from '../../types/movie';
+import { MovieContext, withMovieContext } from '../../controllers/MovieController';
 
-interface Props {
+interface Props extends MovieContext{
     movie: Movie;
 	onClick?: () => void;
 }
 
-const MovieCover: FunctionComponent<Props> = (props: Props) => {
-	const { movie: { backdrop_path, poster_path, original_title, vote_average }, onClick } = props;	
+const MovieCoverComponent: FunctionComponent<Props> = (props: Props) => {
+	const {
+		movie: {
+			genre_ids,
+			backdrop_path,
+			poster_path,
+			original_title,
+			vote_average
+		},
+		onClick,
+		getGenres,
+	} = props;	
+
+	const [genre, setGenre] = useState<Genre>();
+
+    useEffect(() => {
+        prepare();
+    }, []);
+
+    const prepare = async () => {
+        const genresList = await getGenres();
+
+        const genreFound: Genre | undefined = genresList.find((genre: Genre) => genre.id === genre_ids[0]);
+
+		setGenre(genreFound);
+    }
 
 	const Component = onClick ? TouchableOpacity : ScrollView
 
@@ -24,13 +48,14 @@ const MovieCover: FunctionComponent<Props> = (props: Props) => {
 					<Text style={styles.cardTitle} numberOfLines={2}>
 						{original_title}
 					</Text>
-					<View style={styles.cardGenre}>
-						<Text style={styles.cardGenreItem}>Action</Text>
-					</View>
+					{genre && (
+						<View style={styles.cardGenre}>
+							<Text style={styles.cardGenreItem}>{genre.name}</Text>
+						</View>
+					)}
 					<View style={styles.cardNumbers}>
 						<View style={styles.cardStar}>
-							<AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
-							<Text style={styles.cardStarRatings}>{vote_average.toFixed(1)}/10</Text>
+							<Text style={styles.cardStarRatings}>⭐️ {vote_average.toFixed(1)}/10</Text>
 						</View>
 						<Text style={styles.cardRunningHours} />
 					</View>
@@ -91,13 +116,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row'
 	},
 	cardStarRatings: {
-		marginLeft: 5,
 		fontWeight: '800',
 		fontSize: 12,
 		color: 'white'
-	},
-	star: {
-		fontSize: 12,
 	},
 	cardRunningHours: {
 		marginLeft: 5,
@@ -105,4 +126,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export { MovieCover }
+export const MovieCover = withMovieContext(MovieCoverComponent);

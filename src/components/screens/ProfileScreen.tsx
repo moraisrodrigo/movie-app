@@ -7,14 +7,15 @@ import { AuthenticationContext, withAuthenticationContext } from "../../controll
 import { image500 } from "../../services/movies";
 import { ListItem } from "../elements/ListItem";
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { Movie } from "../../types/movie";
+import { Genre, Movie } from "../../types/movie";
 import { MoviesListResponse } from "../../types/responses";
 import { Card } from "../elements/Card";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 import { ThemeContext, withThemeContext } from "../../controllers/ThemeController";
 import { AppTheme } from "../../types/theme";
+import { MovieContext, withMovieContext } from "../../controllers/MovieController";
 
-type Props = ProfileRouteParams & AuthenticationContext & ThemeContext;
+type Props = ProfileRouteParams & AuthenticationContext & ThemeContext & MovieContext;
 
 enum ListType {
     Favourite = 'Favourite',
@@ -34,6 +35,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         authenticatedUser,
         login,
         logout,
+        getGenres,
         getFavouriteMovies,
         getWatchListMovies,
         updateMovieFavourite,
@@ -51,7 +53,19 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
 
     useEffect(() => {
         onListChange();
-    }, [listShown])
+    }, [listShown]);
+
+    const [genres, setGenres] = useState<Genre[]>([]);
+
+    useEffect(() => {
+        prepare();
+    }, []);
+
+    const prepare = async () => {
+        const genresList = await getGenres();
+
+        setGenres(genresList);
+    }
 
     const onMovieClick = (movie: Movie): void => navigate(AppRoute.MovieWrapper, { screen: AppRoute.Movie, params: { movie } });
 
@@ -231,38 +245,45 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         );
     }
 
-    const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>, listType: ListType | null) => (
-        <Swipeable
-            renderRightActions={(_, drag) => renderRightAction(movie, listType, drag)}
-            key={`${index}-${movie.id}`}
-        >
-            <View style={styles.movieWrapper}>
-                <Card
-                    movie={movie}
-                    key={`${index}-${movie.id}`}
-                    onClick={onMovieClick}
-                />
-                <View style={styles.cardDetails}>
-                    <Text style={styles.cardTitle} numberOfLines={2}>
-                        {movie.original_title}
-                    </Text>
-                    <View style={styles.cardGenre}>
-                        <Text style={styles.cardGenreItem}>Action</Text>
-                    </View>
-                    <View style={styles.cardNumbers}>
-                        <View style={styles.cardStar}>
-                            <AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
-                            <Text style={styles.cardStarRatings}>{movie.vote_average.toFixed(1)}/10</Text>
+    const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>, listType: ListType | null) => {
+
+        const genre: Genre | undefined = genres.find((genre: Genre) => genre.id === movie.genre_ids[0]);
+
+        return (
+            <Swipeable
+                renderRightActions={(_, drag) => renderRightAction(movie, listType, drag)}
+                key={`${index}-${movie.id}`}
+            >
+                <View style={styles.movieWrapper}>
+                    <Card
+                        movie={movie}
+                        key={`${index}-${movie.id}`}
+                        onClick={onMovieClick}
+                    />
+                    <View style={styles.cardDetails}>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                            {movie.original_title}
+                        </Text>
+                        {genre && (
+                            <View style={styles.cardGenre}>
+                                <Text style={styles.cardGenreItem}>{genre.name}</Text>
+                            </View>
+                        )}
+                        <View style={styles.cardNumbers}>
+                            <View style={styles.cardStar}>
+                                <AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
+                                <Text style={styles.cardStarRatings}>{movie.vote_average.toFixed(1)}/10</Text>
+                            </View>
+                            <Text style={styles.cardRunningHours} />
                         </View>
-                        <Text style={styles.cardRunningHours} />
+                        <Text numberOfLines={3} style={styles.cardDescription}>
+                            {movie.overview}
+                        </Text>
                     </View>
-                    <Text numberOfLines={3} style={styles.cardDescription}>
-                        {movie.overview}
-                    </Text>
                 </View>
-            </View>
-        </Swipeable>
-    ), []);
+            </Swipeable>
+        )
+    }, []);
 
     const renderBottomSheet = (): ReactNode => {
         const { theme } = props;
@@ -449,4 +470,4 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	},
 });
 
-export const ProfileScreen = withAuthenticationContext(withThemeContext(ProfileScreenComponent));
+export const ProfileScreen = withAuthenticationContext(withThemeContext(withMovieContext(ProfileScreenComponent)));
