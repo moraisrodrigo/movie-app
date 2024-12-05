@@ -38,8 +38,6 @@ class MovieController extends Component<Props> {
 
             return data;
         } catch (e) {
-            console.log("error = ", e);
-            
             return null;
         }
     }
