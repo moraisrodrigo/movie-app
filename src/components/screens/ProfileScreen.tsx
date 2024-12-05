@@ -189,7 +189,10 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
     }
 
     const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>, listType: ListType | null) => (
-        <Swipeable renderRightActions={(_, drag) => renderRightAction(movie, listType, drag)}>
+        <Swipeable
+            renderRightActions={(_, drag) => renderRightAction(movie, listType, drag)}
+            key={`${index}-${movie.id}`}
+        >
             <View style={styles.movieWrapper}>
                 <Card
                     movie={movie}

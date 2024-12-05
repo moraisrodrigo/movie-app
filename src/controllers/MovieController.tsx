@@ -19,12 +19,12 @@ class MovieController extends Component<Props> {
     state = {}
 
     getMoviesList = async (section: SectionKey, request: MoviesListRequest): Promise<MoviesListResponse | null> => {
-        const { dispatchSetFirstMovie } = this.props;
+        const { dispatchSetFirstMovie, firstMovie } = this.props;
 
         try {
             const { data } = await axios.get<MoviesListResponse>(moviesUrl(section, { ...request }));
 
-            if (data.results.length > 0) dispatchSetFirstMovie(data.results[0])
+            if (data.results.length > 0 && !firstMovie) dispatchSetFirstMovie(data.results[0])
 
             return data;
         } catch (e) {

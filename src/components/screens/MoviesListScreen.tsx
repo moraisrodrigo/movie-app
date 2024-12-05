@@ -6,6 +6,7 @@ import { AppRoute, MoviesListRouteParams } from "../../constants/routes";
 import { MoviesList } from "../elements/MoviesList";
 import { MovieCover } from "../elements/MovieCover";
 import { MoviesListResponse } from "../../types/responses";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface Props extends MovieContext, MoviesListRouteParams {}
 
@@ -62,13 +63,19 @@ const MoviesListScreenComponent: FunctionComponent<Props> = (props: Props) => {
                         onClick={() => onMovieClick(firstMovie)}
                     />
                 )}
+            <GestureHandlerRootView style={styles.container}>
                 {renderLists()}
+            </GestureHandlerRootView>
             </ScrollView>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		height: '100%'
+	},
 	screen: {
 		padding: 10,
 		height: '100%'
