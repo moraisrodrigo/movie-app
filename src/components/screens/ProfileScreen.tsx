@@ -283,7 +283,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                 </View>
             </Swipeable>
         )
-    }, []);
+    }, [theme]);
 
     const renderBottomSheet = (): ReactNode => {
         const { theme } = props;
@@ -424,6 +424,7 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
         alignContent: 'center'
     },
     nonAuth: {
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
         textAlign: 'center',
         marginBottom: 10,
     },
@@ -435,7 +436,8 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	cardTitle: {
 		fontSize: 16,
 		fontWeight: '600',
-		paddingTop: 10
+		paddingTop: 10,
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 	},
 	cardGenre: {
 		flexDirection: 'row'
@@ -443,6 +445,7 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	cardGenreItem: {
 		fontWeight: '600',
 		fontSize: 11,
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 		marginRight: 5,
 	},
 	cardNumbers: {
@@ -454,6 +457,7 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	},
 	cardStarRatings: {
 		marginLeft: 5,
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 		fontWeight: '600',
 		fontSize: 12,
 	},
@@ -466,7 +470,8 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	},
     cardDescription: {
 		fontSize: 13,
-		marginTop: 5
+		marginTop: 5,
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 	},
 });
 
