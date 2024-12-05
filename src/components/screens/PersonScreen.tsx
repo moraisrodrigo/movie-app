@@ -1,6 +1,5 @@
 import { FunctionComponent, ReactNode, useEffect, useState } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native';
+import { Text, Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { PersonContext, withPersonContext } from '../../controllers/PersonController';
 import { Person } from '../../types/user';
 import { AppRoute, PersonRouteParams } from '../../constants/routes';
@@ -76,45 +75,45 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 					/>
 					<View style={{ flexWrap: "wrap", flex: 1 }}>
 						<View style={styles.artistInfoContainer}>
-							<Text style={[ styles.artistName, styles.whiteColor]}>
+							<Text style={[styles.artistName, styles.whiteColor]}>
 								{person.name}
 							</Text>
 							{person.known_for_department && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[ styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.whiteColor]}>
 										Known for
 									</Text>
-									<Text style={[ styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.whiteColor]}>
 										{person.known_for_department}
 									</Text>
 								</View>
 							)}
-							{person.gender && (
+							{person.gender > 0 && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[ styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.whiteColor]}>
 										Gender
 									</Text>
-									<Text style={[ styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.whiteColor]}>
 										{person.gender === 1 ? "Female" : "Male"}
 									</Text>
 								</View>
 							)}
 							{person.birthday && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[ styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.whiteColor]}>
 										Birthday
 									</Text>
-									<Text style={[ styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.whiteColor]}>
 										{person.birthday}
 									</Text>
 								</View>
 							)}
 							{person.place_of_birth && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[ styles.titleContent, styles.whiteColor]} >
+									<Text style={[styles.titleContent, styles.whiteColor]} >
 										Place of Birth
 									</Text>
-									<Text style={[ styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.whiteColor]}>
 										{person.place_of_birth}
 									</Text>
 								</View>
