@@ -9,8 +9,10 @@ import { fallbackPersonImage } from '../../constants/misc';
 import { MoviesList } from '../elements/MoviesList';
 import { MoviesListResponse } from '../../types/responses';
 import { Movie } from '../../types/movie';
+import { ThemeContext } from '../../controllers/ThemeController';
+import { AppTheme } from '../../types/theme';
 
-interface Props extends PersonRouteParams, PersonContext { }
+type Props = PersonRouteParams & PersonContext & ThemeContext;
 
 const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
@@ -19,10 +21,13 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 				personId,
 			}
 		},
+		theme,
 		navigation,
 		getPersonDetails,
 		getPersonMovies,
 	} = props;
+
+	const styles = getStyles(theme === AppTheme.Dark);
 
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [person, setPerson] = useState<Person | null>(null);
@@ -75,45 +80,45 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 					/>
 					<View style={{ flexWrap: "wrap", flex: 1 }}>
 						<View style={styles.artistInfoContainer}>
-							<Text style={[styles.artistName, styles.whiteColor]}>
+							<Text style={[styles.artistName, styles.textColor]}>
 								{person.name}
 							</Text>
 							{person.known_for_department && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.textColor]}>
 										Known for
 									</Text>
-									<Text style={[styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.textColor]}>
 										{person.known_for_department}
 									</Text>
 								</View>
 							)}
 							{person.gender > 0 && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.textColor]}>
 										Gender
 									</Text>
-									<Text style={[styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.textColor]}>
 										{person.gender === 1 ? "Female" : "Male"}
 									</Text>
 								</View>
 							)}
 							{person.birthday && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[styles.titleContent, styles.whiteColor]}>
+									<Text style={[styles.titleContent, styles.textColor]}>
 										Birthday
 									</Text>
-									<Text style={[styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.textColor]}>
 										{person.birthday}
 									</Text>
 								</View>
 							)}
 							{person.place_of_birth && (
 								<View style={styles.otherInfoContainer}>
-									<Text style={[styles.titleContent, styles.whiteColor]} >
+									<Text style={[styles.titleContent, styles.textColor]} >
 										Place of Birth
 									</Text>
-									<Text style={[styles.titleData, styles.whiteColor]}>
+									<Text style={[styles.titleData, styles.textColor]}>
 										{person.place_of_birth}
 									</Text>
 								</View>
@@ -125,10 +130,10 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 				<View style={styles.biographyWrapper}>
 					{person.biography && (
 						<>
-							<Text style={[styles.biography, styles.whiteColor]}>
+							<Text style={[styles.biography, styles.textColor]}>
 								Biography
 							</Text>
-							<Text style={styles.whiteColor}>
+							<Text style={styles.textColor}>
 								{person.biography}
 							</Text>
 						</>
@@ -139,14 +144,14 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	  );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	loadingScreen: {
 		height: '100%',
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	whiteColor: {
-		color:'white'
+	textColor: {
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 	},
 	screen: {
 		padding: 10,
