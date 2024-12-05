@@ -11,13 +11,16 @@ import { Movie } from '../../types/movie';
 import { MovieCover } from '../elements/MovieCover';
 import { VideoPlayer } from '../elements/VideoPlayer';
 import { AuthenticationContext, withAuthenticationContext } from '../../controllers/AuthenticationController';
+import { ThemeContext, withThemeContext } from '../../controllers/ThemeController';
+import { AppTheme } from '../../types/theme';
 
-type Props = MovieRouteParams & MovieContext & AuthenticationContext;
+type Props = MovieRouteParams & MovieContext & AuthenticationContext & ThemeContext;
 
 const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
 		route: { params: { movie } },
 		navigation,
+		theme,
 		authenticatedUser,
 		updateMovieFavourite,
 		updateMovieWatchlist,
@@ -25,6 +28,8 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 		getSimilarMovies,
 		getMovieVideos,
 	} = props;
+
+	const styles = getStyles(theme === AppTheme.Dark);
 
     const [cast, setCast] = useState<Cast[]>([])
     const [videos, setVideos] = useState<MovieVideo[]>([]);
@@ -92,14 +97,14 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 					onPress={addFavourite}
 					style={styles.personalIconWrapper}
 				>
-					<AntDesign name='hearto' size={34} style={styles.personalIcon}/>
+					<AntDesign name='hearto' size={34} color="#FF214A" />
 					<Text style={styles.personalIconText}>Favourite</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={addWatchlist}
 					style={styles.personalIconWrapper}
 				>
-					<MaterialIcons name="bookmark-border" size={36} style={styles.personalIcon} />
+					<MaterialIcons name="bookmark-border" size={36} color="#ffd866" />
 					<Text style={styles.personalIconText}>Watchlist</Text>
 				</TouchableOpacity>
 			</View>
@@ -141,7 +146,7 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
     )
 };
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	screen: {
 		position: 'relative',
 		padding: 10,
@@ -162,11 +167,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	personalIcon: {
-		color: 'white',
-	},
 	personalIconText: {
-		color: 'white',
+		color: isDarkTheme ? '#f7f7f7' : '#000000',
 		fontSize: 14,
 	},
 	similarWrapper: {
@@ -209,12 +211,12 @@ const styles = StyleSheet.create({
 		color: 'white'
 	},
 	trailerTitle: {
-        color: 'white',
+		color: isDarkTheme ? '#FFFFFF' : '#000000',
 		paddingBottom: 5,
         fontWeight: 'bold'
 	},
 	cardDescription: {
-		color: '#f7f7f7',
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
 		fontSize: 13,
 		marginTop: 5
 	},
@@ -259,4 +261,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export const MovieScreen =  withMovieContext(withAuthenticationContext(MovieScreenComponent));
+export const MovieScreen =  withMovieContext(withAuthenticationContext(withThemeContext(MovieScreenComponent)));

@@ -4,8 +4,10 @@ import { MovieContext, withMovieContext } from "../../controllers/MovieControlle
 import { Movie } from "../../types/movie";
 import { Card } from "../elements/Card";
 import { MoviesListResponse } from "../../types/responses";
+import { ThemeContext, withThemeContext } from "../../controllers/ThemeController";
+import { AppTheme } from "../../types/theme";
 
-interface Props extends MovieContext {
+interface Props extends MovieContext, ThemeContext {
     title?: string;
     getMovies: (page: number) => Promise<MoviesListResponse | null>;
 	onMovieClick: (movie: Movie) => void;
@@ -19,7 +21,9 @@ const initialList: MoviesListResponse = {
 }
 
 const MoviesListComponent: FunctionComponent<Props> = (props: Props) => {
-    const { getMovies, onMovieClick, title } = props;
+    const { getMovies, onMovieClick, title, theme } = props;
+
+    const styles = getStyles(theme === AppTheme.Dark);
 
     const [moviesList, setMoviesList] = useState<MoviesListResponse>(initialList);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -84,7 +88,7 @@ const MoviesListComponent: FunctionComponent<Props> = (props: Props) => {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
     titleWrapper: {
         marginBottom: 10,
         flexDirection: 'row',
@@ -98,7 +102,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontWeight: 'bold',
-        color: '#FFFFFF'
+        color: isDarkTheme ? '#FFFFFF': '#000000',
     },
     horizontalList: {
         flex: 1,
@@ -106,4 +110,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export const MoviesList = withMovieContext(MoviesListComponent);
+export const MoviesList = withMovieContext(withThemeContext(MoviesListComponent));

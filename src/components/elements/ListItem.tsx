@@ -1,7 +1,9 @@
 import { FunctionComponent, ReactNode } from "react";
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
+import { ThemeContext, withThemeContext } from "../../controllers/ThemeController";
+import { AppTheme } from "../../types/theme";
 
-interface Props {
+interface Props extends ThemeContext {
     onClick: () => void,
     label: string,
     startIcon?: ReactNode,
@@ -10,11 +12,14 @@ interface Props {
 
 const ListItemComponent: FunctionComponent<Props> = (props: Props) => {
     const {
+        theme,
         onClick,
         label,
         startIcon = <></>,
         endIcon = <></>,
     } = props;
+
+	const styles = getStyles(theme === AppTheme.Dark);
 
     return (
         <TouchableOpacity
@@ -31,7 +36,7 @@ const ListItemComponent: FunctionComponent<Props> = (props: Props) => {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
     container: {
         paddingBlock: 10,
         display: "flex",
@@ -48,9 +53,9 @@ const styles = StyleSheet.create({
     },
     text: {
         marginStart: 10,
-        color: "white",
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
         fontSize: 22,
     }
 });
 
-export const ListItem = ListItemComponent;
+export const ListItem = withThemeContext(ListItemComponent);

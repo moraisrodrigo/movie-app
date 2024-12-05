@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { AntDesign, MaterialIcons, Octicons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons, Octicons, Feather } from '@expo/vector-icons';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { Animated, Button, Image, ListRenderItemInfo, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppRoute, ProfileRouteParams } from "../../constants/routes";
@@ -11,8 +11,10 @@ import { Movie } from "../../types/movie";
 import { MoviesListResponse } from "../../types/responses";
 import { Card } from "../elements/Card";
 import Toast, { ToastShowParams } from "react-native-toast-message";
+import { ThemeContext, withThemeContext } from "../../controllers/ThemeController";
+import { AppTheme } from "../../types/theme";
 
-type Props = ProfileRouteParams & AuthenticationContext;
+type Props = ProfileRouteParams & AuthenticationContext & ThemeContext;
 
 enum ListType {
     Favourite = 'Favourite',
@@ -28,6 +30,7 @@ const initialList: MoviesListResponse = {
 
 const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
     const {
+        theme,
         authenticatedUser,
         login,
         logout,
@@ -37,6 +40,8 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         updateMovieWatchlist,
         navigation: { navigate }
     } = props;
+
+	const styles = getStyles(theme === AppTheme.Dark);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -107,6 +112,43 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         return <AntDesign name="user" size={80} color="white" style={styles.avatarFallback} />;
     };
 
+    const renderThemeListItem = (): ReactNode => {
+        const { setTheme, theme } = props;
+
+        const newTheme: AppTheme = theme === AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+
+        return (
+            <ListItem
+                label={`${newTheme} Theme`}
+                onClick={() => setTheme(newTheme)}
+                startIcon={(
+                    <View style={[styles.circle, styles.backgroudPurple]}>
+                        {newTheme === AppTheme.Dark ? (
+                            <MaterialIcons
+                                name="sunny"
+                                size={26}
+                                color="white"
+                            />
+                        ) : (
+                            <Feather
+                                name="moon"
+                                size={26}
+                                color="white"
+                            />
+                        )}
+                    </View>
+                )}
+                endIcon={(
+                    <MaterialIcons
+                        name="arrow-forward-ios"
+                        size={26}
+                        color={theme === AppTheme.Dark ? "#FFFFFF" : "#000000"}
+                    />
+                )}
+            />
+        )
+    }
+
     const renderListItems = (): ReactNode => (
         <>
             <ListItem
@@ -125,7 +167,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                     <MaterialIcons
                         name="arrow-forward-ios"
                         size={26}
-                        color="white"
+                        color={theme === AppTheme.Dark ? "#FFFFFF" : "#000000"}
                     />
                 )}
             />
@@ -145,10 +187,11 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                     <MaterialIcons
                         name="arrow-forward-ios"
                         size={26}
-                        color="white"
+                        color={theme === AppTheme.Dark ? "#FFFFFF" : "#000000"}
                     />
                 )}
             />
+            {renderThemeListItem()}
         </>
     );
 
@@ -222,6 +265,10 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
     ), []);
 
     const renderBottomSheet = (): ReactNode => {
+        const { theme } = props;
+
+        const isDarkTheme: boolean = theme === AppTheme.Dark;
+
         return (
             <BottomSheet
                 ref={bottomSheetRef}
@@ -232,8 +279,8 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                 onClose={onBottomSheetClose}
                 enablePanDownToClose
                 enableDynamicSizing={false}
-                handleIndicatorStyle={{ backgroundColor: "white" }}
-                backgroundStyle={{ backgroundColor: '#111111' }}
+                handleIndicatorStyle={{ backgroundColor: isDarkTheme ? 'white' : '#111111' }}
+                backgroundStyle={{ backgroundColor: isDarkTheme ? '#111111' : 'white' }}
             >
                 <BottomSheetFlatList
                     horizontal={false}
@@ -283,7 +330,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
     contentContainer: {
         padding: 10,
     },
@@ -327,7 +374,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
-        color: '#FFFFFF',
+		color: isDarkTheme ? '#F7F7F7' : '#000000',
     },
     list: {
         width: '100%',
@@ -343,6 +390,9 @@ const styles = StyleSheet.create({
     backgroudRed: {
         backgroundColor: '#FF214A'
     },
+    backgroudPurple: {
+        backgroundColor: '#8d32aa'
+    },
     backgroudYellow: {
         backgroundColor: '#ffd866'
     },
@@ -354,7 +404,6 @@ const styles = StyleSheet.create({
     },
     nonAuth: {
         textAlign: 'center',
-        color: '#FFFFFF',
         marginBottom: 10,
     },
     cardDetails: {
@@ -363,7 +412,6 @@ const styles = StyleSheet.create({
         gap: 8,
 	},
 	cardTitle: {
-		color: 'white',
 		fontSize: 16,
 		fontWeight: '600',
 		paddingTop: 10
@@ -375,7 +423,6 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		fontSize: 11,
 		marginRight: 5,
-		color: 'white'
 	},
 	cardNumbers: {
 		flexDirection: 'row',
@@ -388,7 +435,6 @@ const styles = StyleSheet.create({
 		marginLeft: 5,
 		fontWeight: '600',
 		fontSize: 12,
-		color: 'white'
 	},
 	star: {
 		fontSize: 12,
@@ -398,10 +444,9 @@ const styles = StyleSheet.create({
 		fontSize: 12
 	},
     cardDescription: {
-		color: '#f7f7f7',
 		fontSize: 13,
 		marginTop: 5
 	},
 });
 
-export const ProfileScreen = withAuthenticationContext(ProfileScreenComponent);
+export const ProfileScreen = withAuthenticationContext(withThemeContext(ProfileScreenComponent));

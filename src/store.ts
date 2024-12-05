@@ -3,6 +3,7 @@ import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, R
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { movieReducer } from "./slicers/movieSlice";
 import { authenticationReducer } from "./slicers/authenticationSlice";
+import { preferencesReducer } from "./slicers/preferencesSlice";
 
 const persistConfig = {
     key: 'root',
@@ -12,6 +13,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
     movie: movieReducer,
     authentication: authenticationReducer,
+    preferences: preferencesReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

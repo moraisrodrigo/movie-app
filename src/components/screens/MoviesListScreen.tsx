@@ -63,9 +63,9 @@ const MoviesListScreenComponent: FunctionComponent<Props> = (props: Props) => {
                         onClick={() => onMovieClick(firstMovie)}
                     />
                 )}
-            <GestureHandlerRootView style={styles.container}>
-                {renderLists()}
-            </GestureHandlerRootView>
+                <GestureHandlerRootView style={styles.container}>
+                    {renderLists()}
+                </GestureHandlerRootView>
             </ScrollView>
         </SafeAreaView>
     );

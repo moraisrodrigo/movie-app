@@ -5,15 +5,19 @@ import { fallbackPersonImage } from '../../constants/misc'
 import { image185 } from '../../services/movies'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AppRoute, RootStackParamList } from '../../constants/routes'
+import { ThemeContext, withThemeContext } from '../../controllers/ThemeController'
+import { AppTheme } from '../../types/theme'
 
-type Props = {
+type Props = ThemeContext & {
     navigation: NativeStackNavigationProp<RootStackParamList, AppRoute.Movie, undefined>
     cast: Cast[]
 }
 
-const CastComponent: FunctionComponent<Props> = (props: Props) => {
+const CastElementComponent: FunctionComponent<Props> = (props: Props) => {
 
-    const { cast, navigation: { navigate } } = props;
+    const { cast, navigation: { navigate }, theme } = props;
+
+	const styles = getStyles(theme === AppTheme.Dark);
 
     const onPersonClick = (personId: string) => navigate(AppRoute.Person, { personId })
 
@@ -59,7 +63,7 @@ const CastComponent: FunctionComponent<Props> = (props: Props) => {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
     view: {
         marginVertical: 10,
     },
@@ -85,11 +89,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontWeight: 'bold',
-        color: '#FFFFFF'
+		color: isDarkTheme ? '#f7f7f7' : '#000000',
     },
     name: {
-        color: 'white'
+		color: isDarkTheme ? '#f7f7f7' : '#000000',
     }
 });
 
-export { CastComponent }
+export const CastComponent = withThemeContext(CastElementComponent);
