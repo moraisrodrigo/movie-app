@@ -12,9 +12,10 @@ import { MovieScreen } from './src/components/screens/MovieScreen';
 import { setup } from './src/api';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { StatusBar, Text } from 'react-native';
+import { StatusBar, StyleProp, Text, TextStyle } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getSessionId } from './src/secureStore';
+import Toast, { BaseToast, ErrorToast, ToastConfig, BaseToastProps} from 'react-native-toast-message';
 
 type TabBarIconProps = {
     focused: boolean;
@@ -32,6 +33,23 @@ const MyTheme: Theme = {
         primary: 'rgb(255, 45, 85)',
     },
 };
+
+const toastStyle: StyleProp<TextStyle> = {
+    color: 'white',
+    backgroundColor: '#111111',
+}
+
+const toastProps: BaseToastProps = {
+    contentContainerStyle: toastStyle,
+    text1Style: toastStyle,
+    text2Style: toastStyle,
+}
+
+const toastConfig: ToastConfig = {
+    success: (props) => <BaseToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#3ac9b0' }} />,
+    error: (props) => <ErrorToast {...{...props, ...toastProps}} style={{ borderLeftColor: '#c01c28' }} />,
+};
+  
 
 const getTitle = (route: string): ReactNode => {
     let title: string = 'Movie App';
@@ -140,6 +158,7 @@ const App: FunctionComponent = () => {
                         <Screen name={AppRoute.Profile} component={ProfileScreen} />
                     </Navigator>
                 </NavigationContainer>
+                <Toast config={toastConfig}/>
             </Provider>
         </PersistGate>
     );

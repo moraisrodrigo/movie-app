@@ -13,8 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.movie-app"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -33,19 +32,7 @@
           "supportsBackgroundPlayback": true,
           "supportsPictureInPicture": true
         }
-      ],
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
-        }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "8d0c882b-a044-4c51-8b89-58c0429aae7b"
-      }
-    },
-    "owner": "rodrigomorais1"
+    ]
   }
 }

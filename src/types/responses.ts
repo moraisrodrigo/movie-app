@@ -1,5 +1,9 @@
 import { Genre, Movie } from "./movie";
 
+type PersonalResponse = {
+    success: boolean;
+}
+
 interface ListResponse<T> {
     page: number;
     results: T[];
@@ -65,6 +69,7 @@ type PersonMovies = {
 }
 
 export type {
+    PersonalResponse,
     PersonMovies,
     MoviesListResponse,
     MovieDetails,

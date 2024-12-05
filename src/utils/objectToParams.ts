@@ -4,8 +4,10 @@ const addParam = (previousParams: string, paramName: string, value: string): str
     return previousParams === '' ? newParam : `${previousParams}&${newParam}`;
 }
 
-const objectToParams = (request: Record<string, unknown>): string => {
+const objectToParams = (request?: Record<string, unknown>): string => {
     let params = '';
+
+    if (!request) return params;
 
     Object.keys(request).forEach((paramName: string) => {
         const value = request[paramName];

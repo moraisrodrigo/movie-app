@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { AntDesign, MaterialIcons  } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Button, Image, ListRenderItemInfo, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { AntDesign, MaterialIcons, Octicons } from '@expo/vector-icons';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { Animated, Button, Image, ListRenderItemInfo, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppRoute, ProfileRouteParams } from "../../constants/routes";
 import { AuthenticationContext, withAuthenticationContext } from "../../controllers/AuthenticationController";
 import { image500 } from "../../services/movies";
@@ -10,6 +10,7 @@ import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Movie } from "../../types/movie";
 import { MoviesListResponse } from "../../types/responses";
 import { Card } from "../elements/Card";
+import Toast, { ToastShowParams } from "react-native-toast-message";
 
 type Props = ProfileRouteParams & AuthenticationContext;
 
@@ -32,6 +33,8 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         logout,
         getFavouriteMovies,
         getWatchListMovies,
+        updateMovieFavourite,
+        updateMovieWatchlist,
         navigation: { navigate }
     } = props;
 
@@ -149,32 +152,70 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
         </>
     );
 
-    const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>) => (
-        <View style={styles.movieWrapper}>
-            <Card
-                movie={movie}
-                key={`${index}-${movie.id}`}
-                onClick={onMovieClick}
-            />
-            <View style={styles.cardDetails}>
-                <Text style={styles.cardTitle} numberOfLines={2}>
-                    {movie.original_title}
-                </Text>
-                <View style={styles.cardGenre}>
-                    <Text style={styles.cardGenreItem}>Action</Text>
-                </View>
-                <View style={styles.cardNumbers}>
-                    <View style={styles.cardStar}>
-                        <AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
-                        <Text style={styles.cardStarRatings}>{movie.vote_average.toFixed(1)}/10</Text>
+    const removeMovie = async (movie: Movie, listType: ListType | null): Promise<void> => {
+        const errorToastParams: ToastShowParams = { autoHide: true, type: 'error', text1: 'An error ocurred' };
+
+        if (!listType) return Toast.show(errorToastParams);
+
+        const isFavouriteList: boolean = listType === ListType.Favourite;
+
+        const update = isFavouriteList ? updateMovieFavourite : updateMovieWatchlist;
+
+		const { success } = await update(movie, false);
+
+        if (!success) return Toast.show(errorToastParams);
+
+        setMoviesList((prevMovieList: MoviesListResponse) => ({
+            ...prevMovieList,
+            results: prevMovieList.results.filter((prevMovie: Movie) => prevMovie.id !== movie.id),
+        }))
+
+		let title = isFavouriteList ? 'Removed from Favourites' : 'Removed from Watchlist'
+
+        Toast.show({ autoHide: true, type: success ? 'success' : 'error', text1: title });	
+    }
+
+    const renderRightAction = (movie: Movie, listType: ListType | null, drag: Animated.AnimatedInterpolation<string | number>): ReactNode => {
+        const scale = drag.interpolate({
+            inputRange: [-100, 0],
+            outputRange: [1, 0],
+        })
+        
+        return (
+            <TouchableOpacity style={{ ...styles.rightAction, transform: [{ scale }]}} onPress={() => removeMovie(movie, listType)}>
+                <Octicons name="trash" color="white" size={26} />
+            </TouchableOpacity>
+        );
+    }
+
+    const renderCard = useCallback(({ item: movie, index }: ListRenderItemInfo<Movie>, listType: ListType | null) => (
+        <Swipeable renderRightActions={(_, drag) => renderRightAction(movie, listType, drag)}>
+            <View style={styles.movieWrapper}>
+                <Card
+                    movie={movie}
+                    key={`${index}-${movie.id}`}
+                    onClick={onMovieClick}
+                />
+                <View style={styles.cardDetails}>
+                    <Text style={styles.cardTitle} numberOfLines={2}>
+                        {movie.original_title}
+                    </Text>
+                    <View style={styles.cardGenre}>
+                        <Text style={styles.cardGenreItem}>Action</Text>
                     </View>
-                    <Text style={styles.cardRunningHours} />
+                    <View style={styles.cardNumbers}>
+                        <View style={styles.cardStar}>
+                            <AntDesign name='star' color="#FFFF00" size={40} style={styles.star}/>
+                            <Text style={styles.cardStarRatings}>{movie.vote_average.toFixed(1)}/10</Text>
+                        </View>
+                        <Text style={styles.cardRunningHours} />
+                    </View>
+                    <Text numberOfLines={3} style={styles.cardDescription}>
+                        {movie.overview}
+                    </Text>
                 </View>
-				<Text numberOfLines={3} style={styles.cardDescription}>
-					{movie.overview}
-				</Text>
             </View>
-        </View>
+        </Swipeable>
     ), []);
 
     const renderBottomSheet = (): ReactNode => {
@@ -196,7 +237,7 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                     contentContainerStyle={styles.contentContainer}
                     scrollEnabled={true}
                     data={moviesList.results}
-                    renderItem={renderCard}
+                    renderItem={(item) => renderCard(item, listShown)}
                     onEndReachedThreshold={0.3}
                     onEndReached={() => fetchMovies(true)}
                     keyExtractor={(movie) => String(`${movie.id}`)}
@@ -247,8 +288,14 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%'
     },
+    rightAction: {
+        width: 100,
+        marginStart: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'red',
+    },
 	movieWrapper: {
-        display: 'flex',
         paddingBlock: 10,
         flexDirection: 'row',
     },

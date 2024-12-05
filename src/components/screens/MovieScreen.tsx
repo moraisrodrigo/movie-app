@@ -1,6 +1,7 @@
 import { FunctionComponent, ReactNode, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native';
+import { TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, View, Text } from 'react-native';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import { AppRoute, MovieRouteParams } from '../../constants/routes';
 import { MovieContext, withMovieContext } from '../../controllers/MovieController';
 import { Cast, MovieCreditsResponse, MoviesListResponse, MovieVideo, MovieVideosResult } from '../../types/responses';
@@ -9,13 +10,17 @@ import { MoviesList } from '../elements/MoviesList';
 import { Movie } from '../../types/movie';
 import { MovieCover } from '../elements/MovieCover';
 import { VideoPlayer } from '../elements/VideoPlayer';
+import { AuthenticationContext, withAuthenticationContext } from '../../controllers/AuthenticationController';
 
-interface Props extends MovieRouteParams, MovieContext { }
+type Props = MovieRouteParams & MovieContext & AuthenticationContext;
 
 const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 	const {
 		route: { params: { movie } },
 		navigation,
+		authenticatedUser,
+		updateMovieFavourite,
+		updateMovieWatchlist,
 		getMovieCredits,
 		getSimilarMovies,
 		getMovieVideos,
@@ -52,12 +57,61 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
         );
     };
 
+	const addFavourite = async (): Promise<void> => {
+		const { success } = await updateMovieFavourite(movie, true);
+
+		let title = success ? 'Added to Favourites 🎉!' : 'An error ocurred'
+
+		Toast.show({
+			autoHide: true,
+			type: success ? 'success' : 'error',
+			text1: title,
+			text2: success ? 'You can view all favourite movies in your profile page' : undefined,
+		});		
+	}
+
+	const addWatchlist = async (): Promise<void> => {
+		const { success } = await updateMovieWatchlist(movie, true);
+
+		let title = success ? 'Added to Watchlist 🎉!' : 'An error ocurred'
+
+		Toast.show({
+			autoHide: true,
+			type: success ? 'success' : 'error',
+			text1: title,
+			text2: success ? 'You can view watchlist movies in your profile page' : undefined,
+		});		
+	}
+
+	const renderPersonal = (): ReactNode => {
+		if (!authenticatedUser) return null;
+
+		return (
+			<View style={styles.personalWrapper}>
+				<TouchableOpacity
+					onPress={addFavourite}
+					style={styles.personalIconWrapper}
+				>
+					<AntDesign name='hearto' size={34} style={styles.personalIcon}/>
+					<Text style={styles.personalIconText}>Favourite</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={addWatchlist}
+					style={styles.personalIconWrapper}
+				>
+					<MaterialIcons name="bookmark-border" size={36} style={styles.personalIcon} />
+					<Text style={styles.personalIconText}>Watchlist</Text>
+				</TouchableOpacity>
+			</View>
+		)
+	};
+
 	const renderTrailers = (): ReactNode => {
 		if (!videos || videos.length === 0) return null;
 
 		return (
 			<View style={styles.trailerWrapper}>
-				<View style={styles.trailerTitleWrapper}>
+				<View style={styles.sectionTitleWrapper}>
 					<View style={styles.line} />
 					<View>
 						<Text style={styles.trailerTitle}>Trailer</Text>
@@ -78,6 +132,7 @@ const MovieScreenComponent: FunctionComponent<Props> = (props: Props) => {
 				<Text style={styles.cardDescription}>
 					{movie.overview}
 				</Text>
+				{renderPersonal()}
 				{renderCast()}
 				{renderTrailers()}
 				{renderSimilar()}
@@ -94,6 +149,25 @@ const styles = StyleSheet.create({
 	},
 	trailerWrapper: {
 		marginBottom: 5,
+	},
+	personalWrapper: {
+		display: 'flex',
+		flexDirection: 'row',
+		paddingInline: 10,
+		gap: 10,
+		marginTop: 15,
+	},
+	personalIconWrapper: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	personalIcon: {
+		color: 'white',
+	},
+	personalIconText: {
+		color: 'white',
+		fontSize: 14,
 	},
 	similarWrapper: {
 		marginBottom: 25,
@@ -172,7 +246,7 @@ const styles = StyleSheet.create({
 	viewButtonText: {
 		color: 'white'
 	},
-    trailerTitleWrapper: {
+    sectionTitleWrapper: {
         marginBottom: 10,
         flexDirection: 'row',
         alignItems: 'center'
@@ -185,4 +259,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export const MovieScreen =  withMovieContext(MovieScreenComponent);
+export const MovieScreen =  withMovieContext(withAuthenticationContext(MovieScreenComponent));

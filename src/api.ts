@@ -9,6 +9,8 @@ const setupInterceptor = (sessionId: string | null) => {
 
             newConfig.headers.Accept = 'application/json';
 
+            newConfig.headers["Content-Type"] = 'application/json';
+
             newConfig.headers.Authorization = ` Bearer ${TMDB_API_TOKEN}`;
 
             if (sessionId) newConfig.params = { ...newConfig.params, session_id: sessionId }

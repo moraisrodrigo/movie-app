@@ -9,9 +9,10 @@ import axios from "axios";
 import { RequestTokenCreate, SessionCreate } from "../types/authentication";
 import { getSessionId, setSessionId } from "../secureStore";
 import { setup } from "../api";
-import { MoviesListResponse } from "../types/responses";
-import { favouriteMoviesUrl, watchlistMoviesUrl } from "../services/movies";
-import { ListParams } from "../types/requests";
+import { MoviesListResponse, PersonalResponse } from "../types/responses";
+import { favouriteMoviesUrl, updateFavouriteMoviesUrl, updatewatchlistMoviesUrl, watchlistMoviesUrl } from "../services/movies";
+import { ListParams, MovieFavouriteRequest, MovieWatchListRequest } from "../types/requests";
+import { Movie } from "../types/movie";
 
 
 interface OwnProps {
@@ -91,6 +92,52 @@ class AuthenticationController extends Component<Props> {
         }
     }
 
+    updateMovieFavourite = async (movie: Movie, isFavourite: boolean): Promise<PersonalResponse> => {
+        const response: PersonalResponse = { success: false };
+
+        const { authenticatedUser } = this.props;
+
+        if (!authenticatedUser) return response;
+
+        try {
+
+            const request: MovieFavouriteRequest = {
+                media_type: "movie",
+                media_id: movie.id,
+                favorite: isFavourite,
+            }
+
+            const { data } = await axios.post<PersonalResponse>(updateFavouriteMoviesUrl(String(authenticatedUser.id)), { ...request });
+
+            return data;
+        } catch {
+            return response;
+        }
+    }
+
+    updateMovieWatchlist = async (movie: Movie, addToWatchList: boolean): Promise<PersonalResponse> => {
+        const response: PersonalResponse = { success: false };
+
+        const { authenticatedUser } = this.props;
+
+        if (!authenticatedUser) return response;
+
+        try {
+
+            const request: MovieWatchListRequest = {
+                media_type: "movie",
+                media_id: movie.id,
+                watchlist: addToWatchList,
+            }
+
+            const { data } = await axios.post<PersonalResponse>(updatewatchlistMoviesUrl(String(authenticatedUser.id)), { ...request });
+
+            return data;
+        } catch {
+            return response;
+        }
+    }
+
     render(): ReactNode {
         const { children, authenticatedUser } = this.props;
 
@@ -102,6 +149,8 @@ class AuthenticationController extends Component<Props> {
                     logout: this.logout,
                     getFavouriteMovies: this.getFavouriteMovies,
                     getWatchListMovies: this.getWatchListMovies,
+                    updateMovieFavourite: this.updateMovieFavourite,
+                    updateMovieWatchlist: this.updateMovieWatchlist,
                 }}
             >
                 {children}
