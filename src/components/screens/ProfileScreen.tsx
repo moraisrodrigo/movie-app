@@ -138,14 +138,14 @@ const ProfileScreenComponent: FunctionComponent<Props> = (props: Props) => {
                 startIcon={(
                     <View style={[styles.circle, styles.backgroudPurple]}>
                         {newTheme === AppTheme.Dark ? (
-                            <MaterialIcons
-                                name="sunny"
+                            <Feather
+                                name="moon"
                                 size={26}
                                 color="white"
                             />
                         ) : (
-                            <Feather
-                                name="moon"
+                            <MaterialIcons
+                                name="sunny"
                                 size={26}
                                 color="white"
                             />

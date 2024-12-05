@@ -61,7 +61,7 @@ const AppRouterComponent: FunctionComponent<OwnProps> = (props: OwnProps) => {
                 title = 'Profile'
             break;
             case AppRoute.Person:
-                title = 'Profile';
+                title = 'Person';
             break;
             case AppRoute.Movie:
                 title = 'Details'

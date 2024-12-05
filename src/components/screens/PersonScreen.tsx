@@ -9,7 +9,7 @@ import { fallbackPersonImage } from '../../constants/misc';
 import { MoviesList } from '../elements/MoviesList';
 import { MoviesListResponse } from '../../types/responses';
 import { Movie } from '../../types/movie';
-import { ThemeContext } from '../../controllers/ThemeController';
+import { ThemeContext, withThemeContext } from '../../controllers/ThemeController';
 import { AppTheme } from '../../types/theme';
 
 type Props = PersonRouteParams & PersonContext & ThemeContext;
@@ -198,4 +198,4 @@ const getStyles = (isDarkTheme: boolean) => StyleSheet.create({
 	},
 });
 
-export const PersonScreen =  withPersonContext(PersonScreenComponent);
+export const PersonScreen =  withPersonContext(withThemeContext(PersonScreenComponent));
