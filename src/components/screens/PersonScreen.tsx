@@ -71,57 +71,62 @@ const PersonScreenComponent: FunctionComponent<Props> = (props: Props) => {
 			<ScrollView style={styles.screen}>
 				<View style={styles.secondContainer}>
 					<Image
-					style={styles.imageView}
-					source={{ uri: image342(person.profile_path) || fallbackPersonImage }}
+						style={styles.imageView}
+						source={{ uri: image342(person.profile_path) || fallbackPersonImage }}
 					/>
 					<View style={{ flexWrap: "wrap", flex: 1 }}>
-					<View style={styles.artistInfoContainer}>
-						<Text style={[ styles.artistName, styles.whiteColor]}>
-						{person.name}
-						</Text>
-						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, styles.whiteColor]}>
-							Known for
-						</Text>
-						<Text style={[ styles.titleData, styles.whiteColor]}>
-							{person.known_for_department}
-						</Text>
+						<View style={styles.artistInfoContainer}>
+							<Text style={[ styles.artistName, styles.whiteColor]}>
+								{person.name}
+							</Text>
+							{person.known_for_department && (
+								<View style={styles.otherInfoContainer}>
+									<Text style={[ styles.titleContent, styles.whiteColor]}>
+										Known for
+									</Text>
+									<Text style={[ styles.titleData, styles.whiteColor]}>
+										{person.known_for_department}
+									</Text>
+								</View>
+							)}
+							{person.gender && (
+								<View style={styles.otherInfoContainer}>
+									<Text style={[ styles.titleContent, styles.whiteColor]}>
+										Gender
+									</Text>
+									<Text style={[ styles.titleData, styles.whiteColor]}>
+										{person.gender === 1 ? "Female" : "Male"}
+									</Text>
+								</View>
+							)}
+							{person.birthday && (
+								<View style={styles.otherInfoContainer}>
+									<Text style={[ styles.titleContent, styles.whiteColor]}>
+										Birthday
+									</Text>
+									<Text style={[ styles.titleData, styles.whiteColor]}>
+										{person.birthday}
+									</Text>
+								</View>
+							)}
+							{person.place_of_birth && (
+								<View style={styles.otherInfoContainer}>
+									<Text style={[ styles.titleContent, styles.whiteColor]} >
+										Place of Birth
+									</Text>
+									<Text style={[ styles.titleData, styles.whiteColor]}>
+										{person.place_of_birth}
+									</Text>
+								</View>
+							)}
 						</View>
-						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, styles.whiteColor]}>
-							Gender
-						</Text>
-						<Text style={[ styles.titleData, styles.whiteColor]}>
-							{person.gender === 1 ? "Female" : "Male"}
-						</Text>
-						</View>
-						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, styles.whiteColor]}>
-							Birthday
-						</Text>
-						<Text
-							style={[ styles.titleData, styles.whiteColor]}>
-							{person.birthday}
-						</Text>
-						</View>
-						<View style={styles.otherInfoContainer}>
-						<Text style={[ styles.titleContent, styles.whiteColor]} >
-							Place of Birth
-						</Text>
-						<Text style={[ styles.titleData, styles.whiteColor]}>
-							{person.place_of_birth}
-						</Text>
-						</View>
-					</View>
 					</View>
 				</View>
 				{renderMovies()}
 				<View style={styles.biographyWrapper}>
 					{person.biography && (
 						<>
-							<Text
-								style={[styles.biography, styles.whiteColor]}
-							>
+							<Text style={[styles.biography, styles.whiteColor]}>
 								Biography
 							</Text>
 							<Text style={styles.whiteColor}>
